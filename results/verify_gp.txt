@@ -1,0 +1,28 @@
+GP verification on 1-D synthetic data  (n = 12, ell = 0.2, sf2 = 1, sigma = 0.1)
+------------------------------------------------------------------------------
+(a) LML  Cholesky implementation = 1.7264286562
+    LML  scipy MVN logpdf         = 1.7264286562   |diff| = 1.53e-14
+(b) max |mu - mu_direct|   = 1.51e-14
+    max |cov - cov_direct| = 3.00e-15
+(c) max |mu - mu_sklearn|   = 1.60e-14
+    max |cov - cov_sklearn| = 3.11e-15
+    LML sklearn = 1.7264286562
+(d) dNLML/dtheta analytic = [-5.648964  1.871245  4.361173]
+    dNLML/dtheta finite-d = [-5.648964  1.871245  4.361173]
+(e) Monte-Carlo (400000 joint prior draws): max |mu - mu_MC| = 0.002, max |var - var_MC| = 0.0013
+
+   x*      mu(x*)     var(x*)    f_true(x*)
+  0.000    0.38397    0.321101    0.00000
+  0.125    0.80750    0.024994    0.74414
+  0.250    1.07980    0.005874    1.12249
+  0.375    0.95335    0.003356    0.96557
+  0.500    0.41345    0.008272    0.39112
+  0.625   -0.31236    0.005019   -0.25906
+  0.750   -0.67886    0.006734   -0.60253
+  0.875   -0.39590    0.004993   -0.42143
+  1.000    0.10289    0.020471    0.22058
+
+Fitted surrogates on the same data with two injected outliers (hyperparameters learned):
+  GP         RMSE vs f = 0.303, sigma = 1.129, ell = 0.203
+  Laplace-t  RMSE vs f = 0.170, sigma = 0.576, ell = 0.227, W<0 flagged at [4, 9]
+  VI-t       RMSE vs f = 0.167, sigma = 0.565, ell = 0.223, E[tau] at outliers = [0.152 0.231]
