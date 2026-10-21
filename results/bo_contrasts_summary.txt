@@ -1,0 +1,34 @@
+Study B matched-seed contrasts (final simple regret, n = 20 seeds per cell)
+contrasts: 252 (surrogate 126, incumbent 126); primary: 14
+
+Multiplicity (number of contrasts with adjusted p < 0.05):
+  new contrasts       nominal p<0.05:  41 / 252   BH q<0.05:   8   Holm:   2
+  bo_paired_tests.csv nominal p<0.05:  26 / 112   BH q<0.05:  15   Holm:   5
+  primary family      nominal p<0.05:   5 / 14   Holm (within 14):   0
+
+Primary contrasts (sym10). d = regret(A) - regret(B); negative favours A.
+problem family    A vs B                 fixed       med A   med B   med d             95% CI   win   r_rb        p  Holm14
+branin  surrogate Laplace-t vs GP        y_best      0.033   0.055  -0.004 [ -0.043,   0.021]  0.60  -0.10  0.72851  1.0000
+branin  surrogate VI-t vs GP             y_best      0.045   0.055  -0.007 [ -0.030,   0.040]  0.55   0.04  0.89832  1.0000
+branin  surrogate Laplace-t vs GP        mu_obs      0.055   0.104  -0.046 [ -0.135,  -0.021]  0.75  -0.56  0.02664  0.2664
+branin  surrogate VI-t vs GP             mu_obs      0.033   0.104  -0.046 [ -0.176,  -0.017]  0.75  -0.70  0.00422  0.0591
+branin  incumbent mu_obs vs y_best       GP          0.104   0.055   0.030 [ -0.008,   0.171]  0.35   0.44  0.08969  0.8073
+branin  incumbent mu_obs vs y_best       Laplace-t   0.055   0.033   0.015 [ -0.019,   0.034]  0.45   0.20  0.45238  1.0000
+branin  incumbent mu_obs vs y_best       VI-t        0.033   0.045  -0.013 [ -0.042,   0.010]  0.60  -0.20  0.45238  1.0000
+camel   surrogate Laplace-t vs GP        y_best      0.410   0.724  -0.071 [ -0.340,   0.160]  0.55  -0.05  0.86949  1.0000
+camel   surrogate VI-t vs GP             y_best      0.120   0.724  -0.214 [ -0.695,  -0.046]  0.75  -0.25  0.34881  1.0000
+camel   surrogate Laplace-t vs GP        mu_obs      0.105   0.272  -0.210 [ -0.608,  -0.076]  0.75  -0.62  0.01362  0.1498
+camel   surrogate VI-t vs GP             mu_obs      0.127   0.272  -0.210 [ -0.831,  -0.025]  0.80  -0.70  0.00486  0.0632
+camel   incumbent mu_obs vs y_best       GP          0.272   0.724   0.010 [ -0.434,   0.299]  0.50   0.09  0.75617  1.0000
+camel   incumbent mu_obs vs y_best       Laplace-t   0.105   0.410  -0.176 [ -0.593,  -0.032]  0.85  -0.67  0.00730  0.0875
+camel   incumbent mu_obs vs y_best       VI-t        0.127   0.120  -0.026 [ -0.416,   0.059]  0.55  -0.30  0.26110  1.0000
+
+Exploratory contrasts surviving BH q < 0.05 (all 252 tested together):
+  branin  gaussian  incumbent mu_global vs y_best    fixed=GP        med d=  0.031 [ 0.010,  0.067] win=0.10 q=0.0132
+  branin  student_t surrogate VI-t vs GP             fixed=y_best    med d= -0.128 [-0.216, -0.021] win=0.85 q=0.0132
+  branin  down20    incumbent mu_global vs y_best    fixed=VI-t      med d= -0.118 [-0.390, -0.049] win=0.85 q=0.0271
+  camel   sym10     surrogate VI-t vs Laplace-t      fixed=mu_global med d= -0.327 [-0.906, -0.105] win=0.75 q=0.0446
+  branin  student_t surrogate Laplace-t vs GP        fixed=y_best    med d= -0.061 [-0.180, -0.015] win=0.90 q=0.0451
+  branin  down10    surrogate VI-t vs GP             fixed=mu_obs    med d= -0.129 [-0.248, -0.013] win=0.75 q=0.0451
+  camel   down10    surrogate VI-t vs GP             fixed=y_best    med d= -0.697 [-0.921, -0.341] win=0.85 q=0.0451
+  camel   down20    surrogate VI-t vs GP             fixed=mu_obs    med d= -0.597 [-1.815, -0.184] win=0.85 q=0.0451

@@ -1,0 +1,38 @@
+Latent-coverage details for the exact GP, Gaussian noise (mean over 30 seeds)
+re-run of Study A reference: max |Cov_f(new) - Cov_f(regression.csv)| = 1.11e-16
+nominal levels:  cov50  cov80  cov90  cov95  cov99 ;  if variances are right mean_z2 = 1 and median_z2 = 0.455 (chi-square, 1 df)
+                       cov50  cov80  cov90  cov95  cov95_se  cov99  cov95_inner  cov95_edge  mean_z2  median_z2    rmse  sigma_hat
+problem  config                                                                                                                   
+branin   ref           0.435  0.718  0.824  0.892     0.016  0.953        0.909       0.861    1.593      0.758   3.767      0.533
+         n60           0.450  0.744  0.851  0.911     0.010  0.972        0.919       0.897    1.327      0.624   0.953      0.516
+         n120          0.436  0.724  0.845  0.912     0.006  0.975        0.915       0.908    1.344      0.647   0.572      0.517
+         fixsig        0.435  0.728  0.842  0.910     0.009  0.970        0.928       0.878    1.401      0.676   3.689      0.500
+camel    ref           0.293  0.498  0.595  0.668     0.026  0.774        0.773       0.481    5.467      2.199  17.813      2.487
+         n60           0.345  0.600  0.715  0.786     0.017  0.885        0.863       0.649    2.643      1.159   5.464      0.897
+         n120          0.362  0.628  0.749  0.825     0.009  0.922        0.892       0.706    2.104      0.974   2.307      0.611
+         fixsig        0.290  0.489  0.581  0.652     0.026  0.760        0.752       0.476    5.855      2.269  20.026      0.500
+gp_prior control_true  0.520  0.811  0.908  0.955     0.006  0.992        0.959       0.949    0.936      0.427   0.179      0.100
+         control_est   0.409  0.670  0.777  0.843     0.027  0.918        0.833       0.859    3.932      1.122   0.213      0.080
+
+Study A (existing regression.csv): mean Cov_f and which model is closest to 0.95
+model                 GP  Laplace-t   VI-t    closest
+problem noise                                        
+branin  down10     0.871      0.881  0.853  Laplace-t
+        down20     0.851      0.846  0.849         GP
+        gaussian   0.892      0.852  0.878         GP
+        student_t  0.848      0.845  0.835         GP
+        sym05      0.856      0.882  0.873  Laplace-t
+        sym10      0.869      0.870  0.839  Laplace-t
+        sym20      0.860      0.845  0.831         GP
+        sym30      0.843      0.808  0.796         GP
+camel   down10     0.683      0.727  0.669  Laplace-t
+        down20     0.688      0.705  0.667  Laplace-t
+        gaussian   0.668      0.721  0.655  Laplace-t
+        student_t  0.637      0.727  0.644  Laplace-t
+        sym05      0.683      0.711  0.665  Laplace-t
+        sym10      0.697      0.721  0.670  Laplace-t
+        sym20      0.744      0.739  0.678         GP
+        sym30      0.733      0.706  0.675         GP
+
+Laplace-t closer to 0.95 than GP in 9 of 16 problem/noise settings
+VI-t closer to 0.95 than GP in 2 of 16 problem/noise settings

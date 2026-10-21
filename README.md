@@ -111,6 +111,10 @@ DDP/
 ├── run_bo.py                # Study B: factorial Bayesian-optimization experiment
 ├── paired_regression.py     # Study A paired Wilcoxon comparisons
 ├── make_figures.py          # Derived tables, figures, BO paired tests, and summaries
+├── bo_contrasts.py          # Matched-seed surrogate and incumbent contrasts with multiplicity control
+├── calibration_check.py     # Diagnostics for the below-nominal latent coverage
+├── repro_audit.py           # Reproducibility audit (writes only to audit/)
+├── audit/                   # Audit report, pytest output, checksums, tagged smoke run
 └── README.md
 ```
 
@@ -247,6 +251,20 @@ This generates or refreshes:
 - [`figures/bo_interaction.pdf`](figures/bo_interaction.pdf)
 - all four LaTeX fragments in [`tables/`](tables/)
 
+### Verification scripts added after the 14 October review
+
+These scripts only read the reference outputs above and write new files; they do not replace anything.
+
+```bash
+python bo_contrasts.py        # ~10 s
+python calibration_check.py   # ~15 s
+python repro_audit.py         # ~2 min
+```
+
+- `bo_contrasts.py` writes [`results/bo_contrasts.csv`](results/bo_contrasts.csv) (252 contrasts), [`results/bo_primary_contrasts.csv`](results/bo_primary_contrasts.csv) (14 primary contrasts), and [`results/bo_contrasts_summary.txt`](results/bo_contrasts_summary.txt). Surrogates are compared at a fixed incumbent and incumbents within a fixed surrogate. Each contrast reports the median paired difference, a 95% bootstrap interval, win rate, rank-biserial effect size, Wilcoxon *p*, and Holm/Benjamini–Hochberg adjusted values.
+- `calibration_check.py` writes [`results/calibration_check.csv`](results/calibration_check.csv) and [`results/calibration_check_summary.txt`](results/calibration_check_summary.txt): latent coverage of the exact GP with more data, with the noise fixed at its true value, and on a well-specified GP-prior control.
+- `repro_audit.py` writes [`audit/audit_report.txt`](audit/audit_report.txt) together with the full pytest output, checksums, and a fresh tagged smoke run.
+
 ## Experimental definitions
 
 ### Common random numbers
@@ -312,7 +330,7 @@ The checked-in outputs are complete and internally consistent:
 
 - **Branin regression:** under every non-Gaussian noise setting, both robust models improve observation NLPD relative to the GP. VI-*t* also improves RMSE in all seven non-Gaussian settings; Laplace-*t* improves it in six of seven.
 - **Six-Hump Camel regression:** robust models often improve observation NLPD but generally worsen latent RMSE/NLPD. A heavy-tailed likelihood can treat genuine function structure as noise when the stationary kernel is a poor fit.
-- **Latent calibration:** mean latent coverage remains below the nominal 95% level for all three models—approximately 80–89% on Branin and 64–74% on Camel.
+- **Latent calibration:** mean latent coverage remains below the nominal 95% level for all three models—approximately 80–89% on Branin and 64–74% on Camel. On a well-specified GP-prior control, the exact GP gives 0.955 with the true hyperparameters but 0.843 with estimated ones. On Camel, coverage rises from 0.668 to 0.825 as *n* goes from 30 to 120, and fixing the noise at its true value does not help (0.652). The shortfall therefore comes mainly from plug-in hyperparameter estimation at small *n* and from kernel/mean misspecification, not from the noise model. Laplace-*t* is closer to 0.95 than the GP in only 9 of 16 settings and VI-*t* in 2 of 16, so the Student-*t* likelihood does not uniformly improve calibration (see `calibration_check.py`).
 - **Gaussian-noise BO:** all configurations reach low median regret, and robust modifications do not show a consistent advantage.
 - **Contaminated BO:** the clearest reductions occur when a robust surrogate is paired with a posterior-mean incumbent, particularly on Camel at 10% symmetric or downward contamination.
 - **Higher contamination:** results at 20% contamination are less uniform and have wider seed-to-seed variability; a fixed Student-*t* likelihood with ν = 4 is not a universal solution.
@@ -328,7 +346,7 @@ Selected final-regret comparisons after 50 evaluations:
 | Camel, symmetric 20% | 0.991 [0.412, 1.204] | VI-*t* + `mu_global` | 0.247 [0.056, 0.899] | 0.70 | 0.010689 |
 | Camel, downward 20% | 1.012 [0.250, 2.895] | VI-*t* + `mu_obs` | 0.164 [0.091, 0.915] | 0.65 | 0.023951 |
 
-These are measured effects for the stated benchmarks and seeds only.
+These are measured effects for the stated benchmarks and seeds only. The *p*-values are nominal and come from the 112 exploratory comparisons in `bo_paired_tests.csv`. After Holm correction over those 112, 5 remain below 0.05 (15 under Benjamini–Hochberg). In the 14 pre-specified primary contrasts of `bo_contrasts.py` (10% symmetric contamination, surrogate effect at a fixed incumbent, incumbent effect within a fixed surrogate), 5 have nominal *p* < 0.05 and none remain below 0.05 after Holm correction (smallest adjusted *p* = 0.059).
 
 ## Generated outputs
 

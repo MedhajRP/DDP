@@ -1,0 +1,28 @@
+$ python run_bo.py --seeds 1 --n-init 5 --n-iter 2 --workers 1 --problems branin --tag _smoke
+0 runs already done, 63 to go
+25/63 runs  5s
+50/63 runs  9s
+63/63 runs  11s
+incumbent                    mu_global  mu_obs  y_best
+problem noise     model                               
+branin  down10    GP             1.945   0.056   0.056
+                  Laplace-t      0.169   0.169   8.892
+                  VI-t           0.169   0.169  14.664
+        down20    GP             2.516   2.640   1.641
+                  Laplace-t     15.546  15.546  10.563
+                  VI-t          16.218  16.218  16.218
+        gaussian  GP             0.341   0.109   0.333
+                  Laplace-t      0.153   0.153   0.175
+                  VI-t           0.153   0.153   0.187
+        student_t GP             5.420   5.392   0.503
+                  Laplace-t      0.165   0.165   0.183
+                  VI-t           0.165   0.165   0.199
+        sym05     GP             0.341   0.109   0.333
+                  Laplace-t      0.153   0.153   0.175
+                  VI-t           0.153   0.153   0.187
+        sym10     GP             1.945   0.056   0.056
+                  Laplace-t      0.169   0.169   8.892
+                  VI-t           0.169   0.169  14.664
+        sym20     GP             2.516   2.640   1.641
+                  Laplace-t     15.546  15.546  10.563
+                  VI-t          16.218  16.218  16.218

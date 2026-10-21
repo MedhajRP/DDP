@@ -1,0 +1,129 @@
+Reproducibility audit of the DDP repository, run 2026-10-18 00:11:35 +0530
+====================================================================================================
+1. Git commit and environment
+   commit       : bd188d92d06c066609600e897b182a539d577fbe
+   commit info  : 2026-10-13 00:15:31 +0530 | Upload all files
+   branch       : main
+   modified tracked .py files: 0 []
+   git status --porcelain (M = modified tracked file, ?? = untracked):
+       M robustbo/__pycache__/acquisition.cpython-312.pyc
+       M robustbo/__pycache__/base.cpython-312.pyc
+       M robustbo/__pycache__/laplace_gp.cpython-312.pyc
+       M robustbo/__pycache__/likelihoods.cpython-312.pyc
+       M robustbo/__pycache__/noise.cpython-312.pyc
+       M robustbo/__pycache__/vi_gp.cpython-312.pyc
+      ?? audit/audit_report.txt
+      ?? audit/bo_curves_smoke.csv
+      ?? audit/bo_final_smoke.csv
+      ?? audit/checksums.csv
+      ?? audit/pytest_output.txt
+      ?? audit/smoke_stdout.txt
+      ?? bo_contrasts.py
+      ?? calibration_check.py
+      ?? repro_audit.py
+      ?? results/bo_contrasts.csv
+      ?? results/bo_contrasts_summary.txt
+      ?? results/bo_primary_contrasts.csv
+      ?? results/calibration_check.csv
+      ?? results/calibration_check_summary.txt
+   Python       : 3.12.10  (Windows-11-10.0.26200-SP0)
+   numpy        : 1.26.4
+   scipy        : 1.13.1
+   pandas       : 2.2.2
+   matplotlib   : 3.9.0
+   sklearn      : 1.9.0
+   pytest       : 9.1.1
+   pip          : 26.0.1
+   CPU count    : 12;  OMP/OPENBLAS/MKL threads = 1
+
+2. Test suite: exit code 0; summary line: ============================= 22 passed in 2.30s ==============================
+   22 PASSED lines (full output in audit/pytest_output.txt)
+      tests/test_models.py::test_exact_lml_matches_scipy
+      tests/test_models.py::test_exact_posterior_matches_sklearn
+      tests/test_models.py::test_exact_gradient
+      tests/test_models.py::test_student_t_derivatives
+      tests/test_models.py::test_student_t_predictive_density[0.05-0.3-0.1]
+      tests/test_models.py::test_student_t_predictive_density[2.0-0.01-1.5]
+      tests/test_models.py::test_student_t_predictive_density[0.1-0.1-25.0]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[0.02-0.5]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[0.5-0.5]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[3.0-0.05]
+      tests/test_models.py::test_student_t_interval_quantiles
+      tests/test_models.py::test_robust_gradient[LaplaceStudentTGP]
+      tests/test_models.py::test_robust_gradient[VIStudentTGP]
+      tests/test_models.py::test_robust_reduces_to_gp_for_large_nu[LaplaceStudentTGP]
+      tests/test_models.py::test_robust_reduces_to_gp_for_large_nu[VIStudentTGP]
+      tests/test_models.py::test_laplace_mode_is_stationary
+      tests/test_models.py::test_vi_downweights_outliers
+      tests/test_models.py::test_fit_improves_objective[ExactGP]
+      tests/test_models.py::test_fit_improves_objective[LaplaceStudentTGP]
+      tests/test_models.py::test_fit_improves_objective[VIStudentTGP]
+      tests/test_models.py::test_noise_common_random_numbers
+      tests/test_models.py::test_ei_matches_monte_carlo
+
+3. Reference outputs: 18 committed files, 18 byte-identical to the commit (audit/checksums.csv)
+   figures/bo_curves_muobs.pdf                        1a177f76f1a93d1c  same=True
+   figures/bo_curves_ybest.pdf                        e3684c66d14c3455  same=True
+   figures/bo_interaction.pdf                         8df52f46a71bcbd7  same=True
+   figures/regression_vs_eps.pdf                      2f0edd5a01f567b1  same=True
+   figures/verify_gp.pdf                              0f6a4d7a817005e2  same=True
+   results/bo_curves.csv                  103320 x 9  d9e2d9070323590b  same=True
+   results/bo_final.csv                    2520 x 17  e31fed0a58a05ffb  same=True
+   results/bo_paired_tests.csv               112 x 7  0879a2ae5fac7bfa  same=True
+   results/bo_surrogate_summary.csv           42 x 9  f189de298cdb3fb0  same=True
+   results/log_bo.txt                                 9d1405107de66671  same=True
+   results/log_regression.txt                         47757617626b199d  same=True
+   results/regression.csv                  1440 x 16  4d5e37b50cb40172  same=True
+   results/regression_paired_tests.csv        96 x 7  d08638b7bee3a377  same=True
+   results/verify_gp.txt                              a6bed9dd51cfc7f4  same=True
+   tables/bo_regret_branin.tex                        cf51bc80a4c0d1a0  same=True
+   tables/bo_regret_camel.tex                         848dfab77c4ffa59  same=True
+   tables/regression_branin.tex                       ca9695996340cd02  same=True
+   tables/regression_camel.tex                        b7e7a564ef67b3c8  same=True
+
+4. Row-count reconciliation of the primary tables
+   [OK] regression.csv rows = 2 problems x 8 noises x 30 seeds x 3 models: 1440 (expected 1440)
+   [OK] regression.csv unique (problem,noise,seed,model): 1440 (expected 1440)
+   [OK] bo_final.csv rows = 2 x 7 noises x 3 models x 3 incumbents x 20 seeds: 2520 (expected 2520)
+   [OK] bo_final.csv unique run keys: 2520 (expected 2520)
+   [OK] bo_curves.csv rows = 2520 runs x 41 iterations (0..40): 103320 (expected 103320)
+   [OK] bo_curves.csv runs with exactly 41 rows: 2520 (expected 2520)
+   [OK] bo_paired_tests.csv rows = 2 x 7 x 8 alternatives: 112 (expected 112)
+   [OK] regression_paired_tests.csv rows = 2 x 8 x 2 models x 3 metrics: 96 (expected 96)
+   [OK] bo_surrogate_summary.csv rows = 2 x 7 x 3: 42 (expected 42)
+   [OK] final-iteration regret in bo_curves equals bo_final regret (max |diff| = 0.0e+00)
+   NaN in bo_final regret: 0; NaN in regression rmse: 0
+
+5. Regeneration of derived outputs in a sandbox (exit codes 0, 0)
+   [IDENTICAL] results/regression_paired_tests.csv
+   [IDENTICAL] results/bo_paired_tests.csv
+   [IDENTICAL] results/bo_surrogate_summary.csv
+   [IDENTICAL] tables/regression_branin.tex
+   [IDENTICAL] tables/regression_camel.tex
+   [IDENTICAL] tables/bo_regret_branin.tex
+   [IDENTICAL] tables/bo_regret_camel.tex
+   figures/*.pdf regenerated without error but not compared byte-wise (embedded timestamps)
+
+6. Fresh tagged smoke run: python run_bo.py --seeds 1 --n-init 5 --n-iter 2 --workers 1 --problems branin --tag _smoke
+   exit codes 0, 0; wall 12 s and 12 s; first stdout line: 0 runs already done, 63 to go
+   bo_final_smoke.csv 63 x 17 (expected 63 runs = 7 noises x 3 models x 3 incumbents); bo_curves_smoke.csv 189 rows (expected 63 x 3 = 189)
+   failed runs: 0; Laplace fallbacks: 0
+   two independent executions identical (all columns except wall/fit_time): bo_final True, bo_curves True
+
+7. Re-execution of selected reference runs with the current code
+   BO  branin/gaussian/GP/y_best/seed 0: regret 0.007800 vs 0.007800, fallbacks 0 vs 0; max |diff| = 9.8e-17
+   BO  camel/sym10/VI-t/mu_obs/seed 3: regret 0.315169 vs 0.315169, fallbacks 0 vs 0; max |diff| = 0.0e+00
+   BO  camel/student_t/Laplace-t/mu_obs/seed 5: regret 0.002864 vs 0.002864, fallbacks 1 vs 1; max |diff| = 5.8e-17
+   Study A branin/sym10/seed 0 (3 models, 6 metrics): max |diff| = 1.1e-16
+   Study A camel/down20/seed 7 (3 models, 6 metrics): max |diff| = 1.1e-16
+
+8. Failed runs and Laplace covariance fallbacks
+   Study B: failed runs 0 of 2520 (run_bo.py records exceptions in a 'failed' column; the column is absent)
+   Study B: Laplace fallbacks 1 in 840 Laplace-t runs x 41 fits = 34440 posterior computations; runs affected: 1
+      camel/student_t/Laplace-t/mu_obs/seed 5: n_fallback = 1, final regret = 0.0029
+   GP and VI-t fallbacks: not applicable (n_fallback is always 0)
+   Study A: failed jobs 0 (run_regression.py has no failure handling, so any exception would have stopped the study; all 1440 rows are present)
+   Study A: Laplace fallbacks 0 of 480 refitted Laplace-t models (not stored in regression.csv); RMSE of the refits vs regression.csv: max |diff| = 3.6e-15
+   Note: the separate W >= 0 clipping inside the Newton mode search (laplace_gp.find_mode) is a step-direction safeguard, not a covariance fallback, and is not counted.
+
+Audit finished in 94 s
