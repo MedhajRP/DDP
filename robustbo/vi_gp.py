@@ -8,6 +8,10 @@ Coordinate-ascent updates (both closed form):
     q(tau_i) = Gamma(alpha_i = (nu+1)/2,  beta_i = nu/2 + ((y_i - m_i)^2 + S_ii) / (2 sigma^2))
 With q(f) optimised out, the evidence lower bound is
     ELBO = log N(y | 0, K + diag(N)) + 1/2 sum_i (E[log tau_i] - log E[tau_i]) - sum_i KL(q(tau_i) || p(tau_i)).
+Inner loop: each q(tau) update can only increase the ELBO. The loop stops when
+|ELBO change| < tol * max(1, |ELBO|); a decrease larger than that is counted (n_decrease)
+and the loop continues, so a drop is never taken as convergence. The ELBO trace of every
+inner loop is kept in the returned state (trace, converged, n_decrease) and in inner_log.
 
 """
 import numpy as np
@@ -29,6 +33,7 @@ class VIStudentTGP(BaseGP):
         self.nu = float(nu)
         self.max_inner, self.tol = max_inner, tol
         self._beta = None
+        self.inner_log = []        # one entry per call of _vi (ELBO diagnostics, see _vi)
 
     def reset_state(self):
         self._beta = None
@@ -62,6 +67,8 @@ class VIStudentTGP(BaseGP):
         aq = 0.5 * (self.nu + 1)
         beta = np.full(self.n, aq) if (self._beta is None or len(self._beta) != self.n) else self._beta
         s = self._terms(K, sigma, beta)
+        trace = [s["elbo"]]                      # ELBO after every inner (coordinate-ascent) update
+        converged, n_decrease = False, 0
         for _ in range(self.max_inner):
             V = solve_triangular(s["L"], K, lower=True, check_finite=False)
             Sdiag = np.maximum(np.diag(K) - np.sum(V * V, axis=0), 0.0)
@@ -70,10 +77,21 @@ class VIStudentTGP(BaseGP):
             s_new = self._terms(K, sigma, beta)
             gain = s_new["elbo"] - s["elbo"]
             s = s_new
-            if gain < self.tol * max(1.0, abs(s["elbo"])):
+            trace.append(s["elbo"])
+            thr = self.tol * max(1.0, abs(s["elbo"]))
+            # Coordinate ascent can only increase the ELBO. A change below -thr is a real
+            # decrease (numerical problem), so it is recorded and NOT treated as convergence.
+            if gain < -thr:
+                n_decrease += 1
+            elif gain < thr:                     # |gain| < thr: converged
+                converged = True
                 break
         self._beta = s["beta"]
-        s.update(K0=K0, K=K, sigma=sigma)
+        steps = np.diff(trace)
+        self.inner_log.append(dict(n_iter=len(steps), converged=converged, n_decrease=n_decrease,
+                                   min_step=float(steps.min()) if len(steps) else 0.0))
+        s.update(K0=K0, K=K, sigma=sigma, trace=np.array(trace), converged=converged,
+                 n_decrease=n_decrease)
         return s
 
     def neg_objective(self, theta):

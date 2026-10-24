@@ -101,14 +101,18 @@ class BaseGP:
             starts.append(self.theta.copy())
         starts += [self.random_theta() for _ in range(self.n_restarts)]
         self._best = (np.inf, None, None)
+        self.opt_log = []          # L-BFGS-B outcome of every start (diagnostics only)
         bnds = self.bounds()
         for th0 in starts:
             self.reset_state()
             try:
-                minimize(self._safe_objective, th0, jac=True, method="L-BFGS-B",
-                         bounds=bnds, options={"maxiter": 200})
+                res = minimize(self._safe_objective, th0, jac=True, method="L-BFGS-B",
+                               bounds=bnds, options={"maxiter": 200})
             except (np.linalg.LinAlgError, ValueError):
+                self.opt_log.append(dict(success=False, nit=0, fun=np.nan, message="exception"))
                 continue
+            self.opt_log.append(dict(success=bool(res.success), nit=int(res.nit), fun=float(res.fun),
+                                     message=str(res.message)))
         if self._best[1] is None:
             raise RuntimeError(f"{self.name}: hyperparameter optimisation failed for all starts")
         _, th, state = self._best

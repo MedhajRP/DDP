@@ -1,0 +1,6 @@
+# generated Python bytecode and caches (not part of the source package)
+__pycache__/
+*.pyc
+.pytest_cache/
+# run_bo.py checkpoints
+results/bo_checkpoint*.pkl*

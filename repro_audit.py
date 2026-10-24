@@ -4,7 +4,9 @@ What it does (nothing in results/, tables/ or figures/ is written or replaced):
   1. records the Git commit, working-tree status and the software environment;
   2. runs the full test suite (pytest -v) and saves the complete output;
   3. SHA-256 checksums, sizes and row x column counts of every committed reference output,
-     plus a check that each one is byte-identical to the version in the commit;
+     plus a check that each one is identical to the version in the commit AFTER Git's line-ending
+     normalisation (`git diff --quiet`; this is not a byte comparison, the SHA-256 values are of the
+     working-tree bytes, which have CRLF on Windows - see clean_checkout_audit.py for both);
   4. row-count reconciliation of the primary tables against the experimental design;
   5. regenerates the derived CSVs/tables from the primary CSVs in a temporary sandbox and
      compares checksums with the reference copies (PDF figures embed a creation time, so
@@ -109,7 +111,8 @@ def checksums():
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(AUDIT, "checksums.csv"), index=False)
     log(f"3. Reference outputs: {len(df)} committed files, "
-        f"{int(df.identical_to_commit.sum())} byte-identical to the commit (audit/checksums.csv)")
+        f"{int(df.identical_to_commit.sum())} identical to the commit after Git line-ending normalisation "
+        f"(git diff, not a byte comparison; SHA-256 of the working-tree bytes in audit/checksums.csv)")
     for r in df.itertuples():
         log(f"   {r.file:36s} {r.rows_x_cols:>12s}  {r.sha256[:16]}  same={r.identical_to_commit}")
     log()

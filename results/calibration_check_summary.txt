@@ -1,18 +1,46 @@
-Latent-coverage details for the exact GP, Gaussian noise (mean over 30 seeds)
+Latent-coverage diagnostics for the exact GP, Gaussian noise (mean over 30 seeds)
 re-run of Study A reference: max |Cov_f(new) - Cov_f(regression.csv)| = 1.11e-16
 nominal levels:  cov50  cov80  cov90  cov95  cov99 ;  if variances are right mean_z2 = 1 and median_z2 = 0.455 (chi-square, 1 df)
-                       cov50  cov80  cov90  cov95  cov95_se  cov99  cov95_inner  cov95_edge  mean_z2  median_z2    rmse  sigma_hat
-problem  config                                                                                                                   
-branin   ref           0.435  0.718  0.824  0.892     0.016  0.953        0.909       0.861    1.593      0.758   3.767      0.533
-         n60           0.450  0.744  0.851  0.911     0.010  0.972        0.919       0.897    1.327      0.624   0.953      0.516
-         n120          0.436  0.724  0.845  0.912     0.006  0.975        0.915       0.908    1.344      0.647   0.572      0.517
-         fixsig        0.435  0.728  0.842  0.910     0.009  0.970        0.928       0.878    1.401      0.676   3.689      0.500
-camel    ref           0.293  0.498  0.595  0.668     0.026  0.774        0.773       0.481    5.467      2.199  17.813      2.487
-         n60           0.345  0.600  0.715  0.786     0.017  0.885        0.863       0.649    2.643      1.159   5.464      0.897
-         n120          0.362  0.628  0.749  0.825     0.009  0.922        0.892       0.706    2.104      0.974   2.307      0.611
-         fixsig        0.290  0.489  0.581  0.652     0.026  0.760        0.752       0.476    5.855      2.269  20.026      0.500
-gp_prior control_true  0.520  0.811  0.908  0.955     0.006  0.992        0.959       0.949    0.936      0.427   0.179      0.100
-         control_est   0.409  0.670  0.777  0.843     0.027  0.918        0.833       0.859    3.932      1.122   0.213      0.080
+                            cov50  cov80  cov90  cov95  cov95_se  cov99  cov95_inner  cov95_edge  mean_z2  median_z2    rmse  sigma_hat
+problem  config                                                                                                                        
+branin   ref                0.435  0.718  0.824  0.892     0.016  0.953        0.909       0.861    1.593      0.758   3.767      0.533
+         n60                0.450  0.744  0.851  0.911     0.010  0.972        0.919       0.897    1.327      0.624   0.953      0.516
+         n120               0.436  0.724  0.845  0.912     0.006  0.975        0.915       0.908    1.344      0.647   0.572      0.517
+         fixsig             0.435  0.728  0.842  0.910     0.009  0.970        0.928       0.878    1.401      0.676   3.689      0.500
+         restarts20         0.435  0.718  0.824  0.892     0.016  0.953        0.909       0.861    1.593      0.758   3.767      0.533
+         dense              0.466  0.767  0.877  0.935     0.007  0.984        0.949       0.910    1.153      0.572   2.837      0.501
+         dense_n120         0.430  0.721  0.842  0.909     0.006  0.974        0.912       0.905    1.362      0.655   0.556      0.501
+         quadmean           0.438  0.708  0.807  0.869     0.020  0.939        0.900       0.813    2.314      0.849   3.135      0.475
+camel    ref                0.293  0.498  0.595  0.668     0.026  0.774        0.773       0.481    5.467      2.199  17.813      2.487
+         n60                0.345  0.600  0.715  0.786     0.017  0.885        0.863       0.649    2.643      1.159   5.464      0.897
+         n120               0.362  0.628  0.749  0.825     0.009  0.922        0.892       0.706    2.104      0.974   2.307      0.611
+         fixsig             0.290  0.489  0.581  0.652     0.026  0.760        0.752       0.476    5.855      2.269  20.026      0.500
+         restarts20         0.288  0.486  0.579  0.650     0.030  0.756        0.746       0.479    6.050      2.672  17.688      2.421
+         dense              0.410  0.702  0.814  0.887     0.012  0.968        0.933       0.806    1.514      0.828  14.764      0.477
+         dense_n120         0.393  0.670  0.786  0.856     0.007  0.938        0.913       0.755    1.855      0.804   2.153      0.477
+         quadmean           0.294  0.498  0.593  0.660     0.023  0.758        0.754       0.495    7.125      2.157  13.319      3.115
+gp_prior control_true       0.520  0.811  0.908  0.955     0.006  0.992        0.959       0.949    0.936      0.427   0.179      0.100
+         control_est        0.409  0.670  0.777  0.843     0.027  0.918        0.833       0.859    3.932      1.122   0.213      0.080
+         control_true_n60   0.531  0.827  0.914  0.957     0.006  0.991        0.957       0.956    0.908      0.420   0.103      0.100
+         control_est_n60    0.495  0.782  0.879  0.926     0.014  0.974        0.929       0.921    1.193      0.555   0.113      0.096
+         control_true_n120  0.496  0.796  0.898  0.946     0.006  0.989        0.942       0.953    1.022      0.480   0.070      0.100
+         control_est_n120   0.490  0.791  0.895  0.945     0.006  0.988        0.941       0.950    1.046      0.494   0.071      0.101
+
+Controlled assessment of the 95% latent under-coverage (mean Cov95 over 30 seeds;
+each row changes ONE factor relative to the baseline in brackets; change in parentheses)
+  factor changed                                                           Branin            Camel
+  none: Study A reference, n = 30, theta estimated (2 restarts)             0.892            0.668
+  optimiser: 20 random restarts instead of 2            [ref]      0.892 (+0.000)   0.650 (-0.017)
+  noise variance: sigma fixed at the true value 0.5     [ref]      0.910 (+0.018)   0.652 (-0.015)
+  hyperparameter estimation: theta from 500 points      [ref]      0.935 (+0.043)   0.887 (+0.219)
+  finite sample, theta estimated: n = 30 -> 120         [ref]      0.912 (+0.021)   0.825 (+0.158)
+  finite sample, theta fixed (dense): n = 30 -> 120   [dense]      0.909 (-0.025)   0.856 (-0.031)
+  mean function: quadratic trend + GP on residuals      [ref]      0.869 (-0.023)   0.660 (-0.007)
+
+  optimiser: 20 restarts found a better optimum (by > 1e-3 nats) in 6 of 60 fits; largest gain 4.639 nats
+  interior / boundary-band Cov95 with dense theta: branin 0.949 / 0.910, camel 0.933 / 0.806
+  dense hyperparameters (original units): branin: ell = (0.290, 1.669), sf = 375.51, sigma = 0.501; camel: ell = (0.213, 0.448), sf = 189.13, sigma = 0.477
+  well-specified control (f from the assumed GP prior), mean Cov95: n = 30: true theta 0.955, estimated 0.843, n = 60: true theta 0.957, estimated 0.926, n = 120: true theta 0.946, estimated 0.945
 
 Study A (existing regression.csv): mean Cov_f and which model is closest to 0.95
 model                 GP  Laplace-t   VI-t    closest

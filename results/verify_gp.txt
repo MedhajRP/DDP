@@ -1,4 +1,4 @@
-GP verification on 1-D data  (n = 12, ell = 0.2, sf2 = 1, sigma = 0.1)
+GP verification on 1-D synthetic data  (n = 12, ell = 0.2, sf2 = 1, sigma = 0.1)
 ------------------------------------------------------------------------------
 (a) LML  Cholesky implementation = 1.7264286562
     LML  scipy MVN logpdf         = 1.7264286562   |diff| = 1.53e-14

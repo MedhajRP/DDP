@@ -1,0 +1,47 @@
+Fixed-data surrogate effect vs adaptive-policy effect (sym10, incumbent mu_obs, 20 seeds; final simple regret after 50 evaluations)
+re-run of the 120 Study B runs with the current code: max |regret - bo_final.csv| = 7.1e-04; runs differing by more than 1e-12: 2
+refitting the policy's own surrogate on its final data (5 restarts, no warm start) gives the stored regret in 90% of the runs
+d = regret(A) - regret(GP); negative favours the robust surrogate A. p is nominal; p_holm over these 20 rows.
+problem A         component                        med d             95% CI     q10     q90    mean   win  loss       p   Holm
+branin  Laplace-t policy effect (Study B)         -0.046 [ -0.135,  -0.021]  -0.414   0.061  -0.152  0.75  0.25  0.0266  0.400
+branin  Laplace-t fixed data: GP-policy data      -0.002 [ -0.045,   0.001]  -0.321   0.050  -0.122  0.50  0.30  0.1627  1.000
+branin  Laplace-t fixed data: Laplace-t-policy data  -0.006 [ -0.126,   0.005]  -0.243   0.061  -0.120  0.55  0.30  0.1239  1.000
+branin  Laplace-t data effect: GP recommends      -0.008 [ -0.167,   0.116]  -0.457   0.495  -0.027  0.55  0.45  0.8695  1.000
+branin  Laplace-t data effect: Laplace-t recommends  -0.021 [ -0.079,   0.024]  -0.227   0.145  -0.026  0.60  0.40  0.4304  1.000
+branin  VI-t      policy effect (Study B)         -0.046 [ -0.176,  -0.017]  -0.608   0.032  -0.218  0.75  0.25  0.0042  0.076
+branin  VI-t      fixed data: GP-policy data      -0.002 [ -0.034,   0.001]  -0.313   0.050  -0.120  0.50  0.30  0.1788  1.000
+branin  VI-t      fixed data: VI-t-policy data    -0.027 [ -0.281,  -0.008]  -1.598   0.012  -0.435  0.70  0.30  0.0020  0.038
+branin  VI-t      data effect: GP recommends       0.022 [ -0.029,   0.072]  -0.238   1.127   0.219  0.40  0.60  0.2943  1.000
+branin  VI-t      data effect: VI-t recommends    -0.016 [ -0.083,   0.008]  -0.483   0.080  -0.096  0.65  0.35  0.1231  1.000
+camel   Laplace-t policy effect (Study B)         -0.210 [ -0.608,  -0.076]  -3.102   0.179  -0.631  0.75  0.25  0.0136  0.218
+camel   Laplace-t fixed data: GP-policy data      -0.008 [ -0.145,   0.045]  -1.296   0.797   5.088  0.55  0.30  0.5862  1.000
+camel   Laplace-t fixed data: Laplace-t-policy data  -0.014 [ -0.159,   0.000]  -1.254   0.150  -0.035  0.60  0.15  0.1118  1.000
+camel   Laplace-t data effect: GP recommends      -0.043 [ -0.251,   0.282]  -0.759   1.199   0.013  0.50  0.50  0.9273  1.000
+camel   Laplace-t data effect: Laplace-t recommends  -0.077 [ -0.298,   0.055]  -0.730   0.461  -5.109  0.65  0.35  0.2611  1.000
+camel   VI-t      policy effect (Study B)         -0.210 [ -0.831,  -0.025]  -3.005   0.125  -0.694  0.80  0.20  0.0049  0.083
+camel   VI-t      fixed data: GP-policy data      -0.061 [ -0.158,   0.000]  -1.296   0.033   4.956  0.55  0.15  0.0413  0.579
+camel   VI-t      fixed data: VI-t-policy data    -0.314 [ -1.104,   0.000]  -2.535   0.021  -0.753  0.65  0.15  0.0013  0.027
+camel   VI-t      data effect: GP recommends       0.148 [ -0.071,   0.791]  -0.504   2.353   0.420  0.40  0.60  0.1429  1.000
+camel   VI-t      data effect: VI-t recommends    -0.043 [ -0.217,   0.079]  -0.508   0.309  -5.290  0.60  0.40  0.3884  1.000
+
+Median regret r(P, R): rows = policy that collected the data, columns = recommender
+recommender           GP  Laplace-t   VI-t
+problem policy                            
+branin  GP         0.089      0.078  0.078
+        Laplace-t  0.129      0.058  0.055
+        VI-t       0.161      0.034  0.033
+camel   GP         0.329      0.270  0.163
+        Laplace-t  0.397      0.153  0.097
+        VI-t       0.934      0.130  0.132
+
+Re-run Study B runs that differ from bo_final.csv by more than 1e-12 (see posterior_checks.py: VI-t ELBO stopping rule):
+  ('branin', 'VI-t', 0): re-run 0.204979, stored 0.204268
+  ('branin', 'VI-t', 5): re-run 0.032170, stored 0.032112
+
+Five largest fixed-data regrets (adverse tail; refits with the stated restarts):
+problem  seed    policy recommender     regret  regret_bo
+  camel    14        GP        VI-t 107.653458   0.247028
+  camel    14        GP   Laplace-t 107.653458   0.247028
+  camel     5 Laplace-t   Laplace-t   7.982851   0.038395
+  camel    15      VI-t          GP   3.279357   0.187465
+  camel     2        GP          GP   3.253283   3.253283

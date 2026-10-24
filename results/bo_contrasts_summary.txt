@@ -4,9 +4,12 @@ contrasts: 252 (surrogate 126, incumbent 126); primary: 14
 Multiplicity (number of contrasts with adjusted p < 0.05):
   new contrasts       nominal p<0.05:  41 / 252   BH q<0.05:   8   Holm:   2
   bo_paired_tests.csv nominal p<0.05:  26 / 112   BH q<0.05:  15   Holm:   5
-  primary family      nominal p<0.05:   5 / 14   Holm (within 14):   0
+  selected family     nominal p<0.05:   5 / 14   Holm (within 14):   0
 
-Primary contrasts (sym10). d = regret(A) - regret(B); negative favours A.
+All contrasts are exploratory. The 14 'selected' contrasts were chosen from the design,
+but not documented before the results were seen, so they are not preregistered hypotheses.
+
+Selected contrasts (sym10). d = regret(A) - regret(B); negative favours A.
 problem family    A vs B                 fixed       med A   med B   med d             95% CI   win   r_rb        p  Holm14
 branin  surrogate Laplace-t vs GP        y_best      0.033   0.055  -0.004 [ -0.043,   0.021]  0.60  -0.10  0.72851  1.0000
 branin  surrogate VI-t vs GP             y_best      0.045   0.055  -0.007 [ -0.030,   0.040]  0.55   0.04  0.89832  1.0000
@@ -22,6 +25,82 @@ camel   surrogate VI-t vs GP             mu_obs      0.127   0.272  -0.210 [ -0.
 camel   incumbent mu_obs vs y_best       GP          0.272   0.724   0.010 [ -0.434,   0.299]  0.50   0.09  0.75617  1.0000
 camel   incumbent mu_obs vs y_best       Laplace-t   0.105   0.410  -0.176 [ -0.593,  -0.032]  0.85  -0.67  0.00730  0.0875
 camel   incumbent mu_obs vs y_best       VI-t        0.127   0.120  -0.026 [ -0.416,   0.059]  0.55  -0.30  0.26110  1.0000
+
+Distribution of the 20 paired differences d_s for the selected contrasts (loss = fraction of seeds with d_s > 0)
+problem A vs B                 fixed         min     q10     q25  median     q75     q90     max    mean   win  loss
+branin  Laplace-t vs GP        y_best     -0.258  -0.213  -0.069  -0.004   0.026   0.104   0.222  -0.019  0.60  0.40
+branin  VI-t vs GP             y_best     -0.342  -0.127  -0.045  -0.007   0.060   0.172   0.200   0.001  0.55  0.45
+branin  Laplace-t vs GP        mu_obs     -1.807  -0.414  -0.197  -0.046  -0.009   0.061   0.785  -0.152  0.75  0.25
+branin  VI-t vs GP             mu_obs     -1.905  -0.608  -0.262  -0.046  -0.012   0.032   0.200  -0.218  0.75  0.25
+branin  mu_obs vs y_best       GP         -0.298  -0.083  -0.021   0.030   0.245   0.998   2.086   0.267  0.35  0.65
+branin  mu_obs vs y_best       Laplace-t  -0.172  -0.095  -0.023   0.015   0.066   0.292   2.106   0.134  0.45  0.55
+branin  mu_obs vs y_best       VI-t       -0.231  -0.211  -0.051  -0.013   0.023   0.178   1.353   0.048  0.60  0.40
+camel   Laplace-t vs GP        y_best     -1.394  -0.857  -0.430  -0.071   0.385   1.847   3.011   0.206  0.55  0.45
+camel   VI-t vs GP             y_best     -3.114  -0.930  -0.706  -0.214   0.113   1.269   3.262  -0.032  0.75  0.25
+camel   Laplace-t vs GP        mu_obs     -3.153  -3.102  -0.749  -0.210  -0.000   0.179   0.614  -0.631  0.75  0.25
+camel   VI-t vs GP             mu_obs     -3.238  -3.005  -0.961  -0.210  -0.010   0.125   0.261  -0.694  0.80  0.20
+camel   mu_obs vs y_best       GP         -0.813  -0.753  -0.595   0.010   0.419   1.372   1.927   0.148  0.50  0.50
+camel   mu_obs vs y_best       Laplace-t  -3.962  -2.649  -0.917  -0.176  -0.006   0.202   0.892  -0.689  0.85  0.15
+camel   mu_obs vs y_best       VI-t       -3.353  -2.219  -0.599  -0.026   0.079   0.130   0.317  -0.514  0.55  0.45
+
+Adverse tail of the regret for the selected contrasts (90th percentile and worst seed)
+problem A vs B                 fixed       q90 A   q90 B   max A   max B
+branin  Laplace-t vs GP        y_best      0.168   0.270   0.254   0.374
+branin  VI-t vs GP             y_best      0.221   0.270   0.263   0.374
+branin  Laplace-t vs GP        mu_obs      0.296   1.040   2.338   2.094
+branin  VI-t vs GP             mu_obs      0.206   1.040   1.562   2.094
+branin  mu_obs vs y_best       GP          1.040   0.270   2.094   0.374   <- A worse in the tail
+branin  mu_obs vs y_best       Laplace-t   0.296   0.168   2.338   0.254   <- A worse in the tail
+branin  mu_obs vs y_best       VI-t        0.206   0.221   1.562   0.263
+camel   Laplace-t vs GP        y_best      2.963   1.303   4.098   3.121   <- A worse in the tail
+camel   VI-t vs GP             y_best      2.448   1.303   3.378   3.121   <- A worse in the tail
+camel   Laplace-t vs GP        mu_obs      0.829   3.109   0.965   3.253
+camel   VI-t vs GP             mu_obs      0.315   3.109   1.350   3.253
+camel   mu_obs vs y_best       GP          3.109   1.303   3.253   3.121   <- A worse in the tail
+camel   mu_obs vs y_best       Laplace-t   0.829   2.963   0.965   4.098
+camel   mu_obs vs y_best       VI-t        0.315   2.448   1.350   3.378
+
+Robust surrogate (Laplace-t or VI-t) vs GP at the same incumbent, all settings: 84 contrasts (2 problems x 7 noises x 3 incumbents x 2 robust models)
+  median paired difference > 0 (robust worse)      : 16
+  robust worse in at least half of the seeds       : 22
+  90th-percentile regret higher than the GP's      : 21
+  worst-seed regret higher than the GP's           : 23
+  configurations with median d > 0 or a higher 90th-percentile regret than the GP:
+    branin  down10    Laplace-t at y_best    med d =  -0.032  loss = 0.45  q90  0.440 vs  0.366  max  0.615 vs  2.134  p = 0.330
+    branin  down10    VI-t      at y_best    med d =   0.007  loss = 0.55  q90  0.367 vs  0.366  max  1.137 vs  2.134  p = 0.409
+    branin  down20    VI-t      at y_best    med d =  -0.035  loss = 0.40  q90  1.324 vs  1.035  max  1.600 vs  1.784  p = 0.869
+    branin  gaussian  VI-t      at mu_global med d =  -0.004  loss = 0.35  q90  0.208 vs  0.149  max  0.252 vs  0.243  p = 0.261
+    branin  gaussian  VI-t      at mu_obs    med d =  -0.007  loss = 0.40  q90  0.179 vs  0.133  max  0.203 vs  0.262  p = 0.596
+    branin  gaussian  Laplace-t at y_best    med d =   0.004  loss = 0.55  q90  0.047 vs  0.039  max  0.086 vs  0.117  p = 0.841
+    branin  gaussian  VI-t      at y_best    med d =   0.000  loss = 0.50  q90  0.066 vs  0.039  max  0.146 vs  0.117  p = 0.717
+    branin  student_t Laplace-t at mu_obs    med d =  -0.003  loss = 0.50  q90  0.396 vs  0.162  max  1.551 vs  1.628  p = 0.985
+    branin  student_t VI-t      at mu_obs    med d =  -0.004  loss = 0.45  q90  0.249 vs  0.162  max  1.551 vs  1.628  p = 0.956
+    branin  sym05     Laplace-t at mu_global med d =   0.034  loss = 0.55  q90  0.206 vs  0.303  max  0.260 vs  0.881  p = 0.956
+    camel   down20    VI-t      at mu_global med d =  -0.385  loss = 0.40  q90  3.255 vs  2.558  max  4.819 vs  3.462  p = 0.729
+    camel   down20    Laplace-t at mu_obs    med d =   0.045  loss = 0.55  q90  2.972 vs  3.223  max  6.783 vs  3.408  p = 0.927
+    camel   down20    Laplace-t at y_best    med d =   0.099  loss = 0.60  q90  3.206 vs  3.344  max  3.949 vs  5.134  p = 0.956
+    camel   gaussian  Laplace-t at mu_global med d =   0.034  loss = 0.65  q90  0.281 vs  0.149  max  0.563 vs  0.317  p = 0.123
+    camel   gaussian  VI-t      at mu_global med d =  -0.009  loss = 0.45  q90  0.204 vs  0.149  max  0.442 vs  0.317  p = 0.812
+    camel   gaussian  Laplace-t at mu_obs    med d =  -0.006  loss = 0.45  q90  0.268 vs  0.121  max  0.502 vs  0.141  p = 0.522
+    camel   gaussian  VI-t      at mu_obs    med d =   0.014  loss = 0.55  q90  0.186 vs  0.121  max  0.385 vs  0.141  p = 0.330
+    camel   gaussian  Laplace-t at y_best    med d =   0.027  loss = 0.60  q90  0.234 vs  0.115  max  0.392 vs  0.437  p = 0.409
+    camel   gaussian  VI-t      at y_best    med d =   0.003  loss = 0.60  q90  0.138 vs  0.115  max  0.290 vs  0.437  p = 0.756
+    camel   student_t Laplace-t at y_best    med d =   0.005  loss = 0.50  q90  0.419 vs  0.997  max  3.187 vs  1.689  p = 0.898
+    camel   sym05     Laplace-t at mu_obs    med d =   0.027  loss = 0.60  q90  0.418 vs  0.792  max  0.964 vs  0.979  p = 0.674
+    camel   sym05     VI-t      at mu_obs    med d =   0.004  loss = 0.60  q90  0.215 vs  0.792  max  0.986 vs  0.979  p = 0.985
+    camel   sym05     Laplace-t at y_best    med d =   0.093  loss = 0.70  q90  0.855 vs  1.047  max  3.964 vs  1.705  p = 0.123
+    camel   sym10     Laplace-t at mu_global med d =   0.049  loss = 0.65  q90  3.024 vs  2.007  max  3.494 vs  6.271  p = 0.398
+    camel   sym10     Laplace-t at y_best    med d =  -0.071  loss = 0.45  q90  2.963 vs  1.303  max  4.098 vs  3.121  p = 0.869
+    camel   sym10     VI-t      at y_best    med d =  -0.214  loss = 0.25  q90  2.448 vs  1.303  max  3.378 vs  3.121  p = 0.349
+    camel   sym20     Laplace-t at mu_obs    med d =  -0.233  loss = 0.25  q90  2.183 vs  2.054  max  3.267 vs  3.335  p = 0.105
+    camel   sym20     VI-t      at mu_obs    med d =  -0.126  loss = 0.30  q90  3.105 vs  2.054  max  3.336 vs  3.335  p = 0.245
+    camel   sym20     Laplace-t at y_best    med d =   0.120  loss = 0.60  q90  2.597 vs  3.149  max  6.493 vs  3.428  p = 0.927
+
+Prospective plan: bootstrap power of the planned test (sym10, mu_obs, robust vs GP; Wilcoxon at alpha = 0.05/4; observed differences resampled; optimistic)
+  branin  Laplace-t vs GP  n = 20: 0.42  n = 40: 0.79  n = 60: 0.94  n = 80: 0.99
+  branin  VI-t vs GP       n = 20: 0.68  n = 40: 0.98  n = 60: 1.00  n = 80: 1.00
+  camel   Laplace-t vs GP  n = 20: 0.53  n = 40: 0.89  n = 60: 0.98  n = 80: 1.00
+  camel   VI-t vs GP       n = 20: 0.70  n = 40: 0.98  n = 60: 1.00  n = 80: 1.00
 
 Exploratory contrasts surviving BH q < 0.05 (all 252 tested together):
   branin  gaussian  incumbent mu_global vs y_best    fixed=GP        med d=  0.031 [ 0.010,  0.067] win=0.10 q=0.0132

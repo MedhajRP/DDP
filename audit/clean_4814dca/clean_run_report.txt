@@ -1,0 +1,133 @@
+Clean-checkout reproducibility audit of commit 4814dca63cd5dc0e4a50fb119bc061a8c4f1efd0
+run 2026-10-24 12:28:07 +0530; clean checkout in D:\DDP_clean_4814dca
+====================================================================================================
+1. Clean checkout
+   HEAD of the clone : 4814dca63cd5dc0e4a50fb119bc061a8c4f1efd0  (matches the requested commit)
+   commit            : 2026-10-21 13:31:07 +0530 | Medhaj | Add audit script, calibration checks and results
+   git status right after checkout: clean
+
+2. Environment
+   Python      : 3.12.10 (C:\Users\medha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe)
+   platform    : Windows-11-10.0.26200-SP0; CPU count 12; OMP/OPENBLAS/MKL threads = 1
+   numpy       : 1.26.4
+   scipy       : 1.13.1
+   pandas      : 2.2.2
+   matplotlib  : 3.9.0
+   sklearn     : 1.9.0
+   pytest      : 9.1.1
+   pip         : 26.0.1
+   git         : git version 2.53.0.windows.2
+   core.autocrlf: file:C:/Program Files/Git/etc/gitconfig	true  (text files are checked out with CRLF line endings when this is true)
+   full package list: environment.txt (pip freeze)
+
+3. Checksums of the 68 files tracked in the commit, taken right after the checkout (checksums_clean.csv)
+   Git-normalised content equal to the commit (git hash-object == blob id): 68 / 68
+   byte-for-byte equal to the bytes stored in Git                          : 22 / 68
+   not byte-equal, but equal after CRLF -> LF                               : 46 (Git stores LF, the checkout wrote CRLF: .csv, .md, .py, .tex, .txt)
+   not equal even after line-ending normalisation                          : 0
+   earlier audit/checksums.csv (18 files): its SHA-256 equals the CHECKED-OUT bytes for 17 and the GIT BLOB bytes for 7. Its 'identical_to_commit' column came from `git diff --quiet`, i.e. the normalised comparison, so 'byte-identical' in that report was not accurate for the 11 text files with CRLF.
+
+4. Tests in the clean checkout: exit code 0; 22 passed in 7.72s
+   22 PASSED (full output: pytest_output.txt)
+      tests/test_models.py::test_exact_lml_matches_scipy
+      tests/test_models.py::test_exact_posterior_matches_sklearn
+      tests/test_models.py::test_exact_gradient
+      tests/test_models.py::test_student_t_derivatives
+      tests/test_models.py::test_student_t_predictive_density[0.05-0.3-0.1]
+      tests/test_models.py::test_student_t_predictive_density[2.0-0.01-1.5]
+      tests/test_models.py::test_student_t_predictive_density[0.1-0.1-25.0]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[0.02-0.5]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[0.5-0.5]
+      tests/test_models.py::test_student_t_cdf_vs_bruteforce[3.0-0.05]
+      tests/test_models.py::test_student_t_interval_quantiles
+      tests/test_models.py::test_robust_gradient[LaplaceStudentTGP]
+      tests/test_models.py::test_robust_gradient[VIStudentTGP]
+      tests/test_models.py::test_robust_reduces_to_gp_for_large_nu[LaplaceStudentTGP]
+      tests/test_models.py::test_robust_reduces_to_gp_for_large_nu[VIStudentTGP]
+      tests/test_models.py::test_laplace_mode_is_stationary
+      tests/test_models.py::test_vi_downweights_outliers
+      tests/test_models.py::test_fit_improves_objective[ExactGP]
+      tests/test_models.py::test_fit_improves_objective[LaplaceStudentTGP]
+      tests/test_models.py::test_fit_improves_objective[VIStudentTGP]
+      tests/test_models.py::test_noise_common_random_numbers
+      tests/test_models.py::test_ei_matches_monte_carlo
+
+5. Python bytecode: 15 *.pyc files are tracked in this commit (robustbo/__pycache__, tests/__pycache__)
+   status for the checked-out sources: 15 stale: source mtime/size differ, Python ignores it
+   git status after the tests (PYTHONDONTWRITEBYTECODE=1): clean
+   -> the tracked bytecode is generated, not source; it is removed from the index and ignored (.gitignore) in the working tree, so the next commit / source package does not contain it
+
+6. Independent re-execution with the code of the commit (exit code 0)
+   robustbo imported from D:\DDP_clean_4814dca\robustbo
+   run                                                   values  equal  max |diff|
+   A branin/gaussian/seed 0/GP                               15     15     0.0e+00
+   A branin/gaussian/seed 0/Laplace-t                        15     15     0.0e+00
+   A branin/gaussian/seed 0/VI-t                             15     15     0.0e+00
+   A branin/sym10/seed 0/GP                                  15     15     0.0e+00
+   A branin/sym10/seed 0/Laplace-t                           15     15     0.0e+00
+   A branin/sym10/seed 0/VI-t                                15     15     0.0e+00
+   A camel/student_t/seed 3/GP                               15     15     0.0e+00
+   A camel/student_t/seed 3/Laplace-t                        15     15     0.0e+00
+   A camel/student_t/seed 3/VI-t                             15     15     0.0e+00
+   A camel/down20/seed 7/GP                                  15     15     0.0e+00
+   A camel/down20/seed 7/Laplace-t                           15     15     0.0e+00
+   A camel/down20/seed 7/VI-t                                15     15     0.0e+00
+   B branin/gaussian/GP/y_best/seed 0                        15     15     0.0e+00
+   B branin/gaussian/GP/y_best/seed 0                       123    123     0.0e+00
+   B camel/down10/GP/mu_global/seed 4                        15     15     0.0e+00
+   B camel/down10/GP/mu_global/seed 4                       123    123     0.0e+00
+   B branin/sym10/VI-t/mu_obs/seed 0                         15     15     0.0e+00
+   B branin/sym10/VI-t/mu_obs/seed 0                        123    123     0.0e+00
+   B camel/sym10/VI-t/mu_obs/seed 3                          15     15     0.0e+00
+   B camel/sym10/VI-t/mu_obs/seed 3                         123    123     0.0e+00
+   B branin/sym10/Laplace-t/mu_obs/seed 1                    15     15     0.0e+00
+   B branin/sym10/Laplace-t/mu_obs/seed 1                   123    123     0.0e+00
+   B camel/student_t/Laplace-t/mu_obs/seed 5                 15     15     0.0e+00
+   B camel/student_t/Laplace-t/mu_obs/seed 5                123    123     0.0e+00
+   total: 1008 stored values compared, 1008 bit-identical, max |diff| 0.0e+00 (timing columns ['fit_time', 'wall'] excluded)
+
+7. Derived outputs regenerated in the clone with the scripts of the commit
+   [BYTE-EQUAL      ] results/regression_paired_tests.csv      exit 0; byte-equal to checkout True, to Git blob False; 96 x 7, max |numeric diff| = 0.0e+00, text columns equal: True
+   [BYTE-EQUAL      ] results/bo_paired_tests.csv              exit 0; byte-equal to checkout True, to Git blob False; 112 x 7, max |numeric diff| = 0.0e+00, text columns equal: True
+   [BYTE-EQUAL      ] results/bo_surrogate_summary.csv         exit 0; byte-equal to checkout True, to Git blob False; 42 x 9, max |numeric diff| = 0.0e+00, text columns equal: True
+   [BYTE-EQUAL      ] tables/regression_branin.tex             exit 0; byte-equal to checkout True, to Git blob False; 0 differing lines after CRLF -> LF
+   [BYTE-EQUAL      ] tables/regression_camel.tex              exit 0; byte-equal to checkout True, to Git blob False; 0 differing lines after CRLF -> LF
+   [BYTE-EQUAL      ] tables/bo_regret_branin.tex              exit 0; byte-equal to checkout True, to Git blob False; 0 differing lines after CRLF -> LF
+   [BYTE-EQUAL      ] tables/bo_regret_camel.tex               exit 0; byte-equal to checkout True, to Git blob False; 0 differing lines after CRLF -> LF
+   [DIFFERENT       ] figures/regression_vs_eps.pdf            exit 0; byte-equal to checkout False, to Git blob False; PDF (embeds a creation time; not compared byte-wise)
+   [DIFFERENT       ] figures/bo_curves_ybest.pdf              exit 0; byte-equal to checkout False, to Git blob False; PDF (embeds a creation time; not compared byte-wise)
+   [DIFFERENT       ] figures/bo_curves_muobs.pdf              exit 0; byte-equal to checkout False, to Git blob False; PDF (embeds a creation time; not compared byte-wise)
+   [DIFFERENT       ] figures/bo_interaction.pdf               exit 0; byte-equal to checkout False, to Git blob False; PDF (embeds a creation time; not compared byte-wise)
+   [BYTE-EQUAL      ] results/bo_contrasts.csv                 exit 0; byte-equal to checkout True, to Git blob False; 252 x 20, max |numeric diff| = 0.0e+00, text columns equal: True
+   [BYTE-EQUAL      ] results/bo_primary_contrasts.csv         exit 0; byte-equal to checkout True, to Git blob False; 14 x 20, max |numeric diff| = 0.0e+00, text columns equal: True
+   [BYTE-EQUAL      ] results/bo_contrasts_summary.txt         exit 0; byte-equal to checkout True, to Git blob False; 0 differing lines after CRLF -> LF
+   [BYTE-EQUAL      ] results/calibration_check.csv            exit 0; byte-equal to checkout True, to Git blob False; 300 x 17, max |numeric diff| = 0.0e+00, text columns equal: True
+   [DIFFERENT       ] results/calibration_check_summary.txt    exit 0; byte-equal to checkout False, to Git blob False; 1 differing lines after CRLF -> LF
+   [DIFFERENT       ] results/verify_gp.txt                    exit 0; byte-equal to checkout False, to Git blob False; 1 differing lines after CRLF -> LF
+   [DIFFERENT       ] figures/verify_gp.pdf                    exit 0; byte-equal to checkout False, to Git blob False; PDF (embeds a creation time; not compared byte-wise)
+   git status after regeneration (tracked files whose normalised content changed): 7 [' M figures/bo_curves_muobs.pdf', ' M figures/bo_curves_ybest.pdf', ' M figures/bo_interaction.pdf', ' M figures/regression_vs_eps.pdf', ' M figures/verify_gp.pdf', ' M results/calibration_check_summary.txt', ' M results/verify_gp.txt']
+
+Commands and exit codes (cwd = clone unless stated)
+   [exit 0]     0.1 s  git rev-parse 4814dca
+   [exit 0]     0.9 s  git clone --no-local --no-checkout D:\DDP D:\DDP_clean_4814dca
+   [exit 0]     0.1 s  git checkout --detach 4814dca63cd5dc0e4a50fb119bc061a8c4f1efd0
+   [exit 0]     0.0 s  git rev-parse HEAD
+   [exit 0]     0.0 s  git log -1 --format=%ad | %an | %s --date=iso
+   [exit 0]     0.1 s  git status --porcelain --untracked-files=all
+   [exit 0]     0.0 s  git config --show-origin --get core.autocrlf
+   [exit 0]     1.5 s  python -m pip --version
+   [exit 0]     0.0 s  git --version
+   [exit 0]     9.5 s  python -m pip freeze
+   [exit 0]     0.1 s  git ls-tree -r HEAD
+   [exit 0]     0.1 s  git ls-files --eol
+   [exit 0]    12.6 s  python -m pytest -v -p no:cacheprovider
+   [exit 0]     0.1 s  git status --porcelain --untracked-files=all
+   [exit 0]   113.6 s  python -P clean_checkout_audit.py --reproduce (cwd = clone, PYTHONPATH = clone)
+   [exit 0]     1.2 s  python paired_regression.py
+   [exit 0]    13.0 s  python make_figures.py
+   [exit 0]     2.6 s  python bo_contrasts.py
+   [exit 0]    17.1 s  python calibration_check.py
+   [exit 0]     2.3 s  python verify_gp.py
+   [exit 0]     0.1 s  git status --porcelain
+   (+ 190 git cat-file / hash-object / rev-parse calls, exit codes [0])
+Audit finished in 190 s
