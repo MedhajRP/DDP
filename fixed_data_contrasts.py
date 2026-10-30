@@ -1,8 +1,8 @@
-"""Surrogate effect on a FIXED dataset vs effect of the whole adaptive BO policy
-(mail of 21 Oct, item 2). Limited check that only re-uses existing Study B runs: the selected
+"""Surrogate effect on a fixed dataset vs effect of the whole adaptive BO policy.
+Limited check that only re-uses existing Study B runs: the selected
 setting (10% symmetric contamination), incumbent mu_obs, 20 seeds, both problems.
 
-Study B compares POLICIES. Changing the surrogate changes the EI decisions, therefore the
+Study B compares policies. Changing the surrogate changes the EI decisions, therefore the
 points that are evaluated, therefore both the final dataset and the final recommendation.
 Here the two parts are separated. For every seed the three policies GP / Laplace-t / VI-t
 (with mu_obs) are re-run exactly as in run_bo.py (this also re-checks bo_final.csv), and each
@@ -13,9 +13,13 @@ x_hat = argmin_i mu_R(x_i):
   policy effect                r_BO(A) - r_BO(GP)            (the Study B contrast)
   fixed-data surrogate effect  r(P, A) - r(P, GP)            on GP data and on A data
   data (acquisition) effect    r(A, R) - r(GP, R)            for a fixed recommender R
-Writes NEW files only: results/fixed_data_regrets.csv, results/fixed_data_contrasts.csv,
+"effect" here means a descriptive matched-seed comparison. The components
+are not a causal decomposition: they interact (the gains appear only when the robust surrogate both
+collects the data and recommends), and nothing here shows that the acquisition path alone explains
+the Study B gains. All p-values are post hoc and exploratory.
+Writes new files: results/fixed_data_regrets.csv, results/fixed_data_contrasts.csv,
 results/fixed_data_summary.txt
-Usage: py fixed_data_contrasts.py [--workers 11]      (about 5-10 minutes)
+Usage: py fixed_data_contrasts.py [--workers 11]
 """
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -37,9 +41,7 @@ from robustbo.noise import PURPOSE_ALG, rng_for
 HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(HERE, "results")
 NOISE, INC, SEEDS = "sym10", "mu_obs", range(20)
-REFIT_RESTARTS = 5      # a fresh fit has no warm start; with 1 restart a few refits ended in a
-                        # poor hyperparameter optimum (regret > 50), so more restarts are used
-
+REFIT_RESTARTS = 5      
 
 def job(args):
     pkey, policy, seed = args

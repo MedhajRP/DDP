@@ -34,4 +34,5 @@ Down 20\% & GP & \textbf{19.40 $\pm$ 0.69} & \textbf{5.70 $\pm$ 0.37} & 0.69 $\p
  & Laplace-$t$ & 22.21 $\pm$ 1.08 & 6.12 $\pm$ 0.35 & \textbf{0.71 $\pm$ 0.02} & \textbf{4.53 $\pm$ 0.08} & \textbf{0.82 $\pm$ 0.02} \\
  & VI-$t$ & 22.41 $\pm$ 1.00 & 6.51 $\pm$ 0.48 & 0.67 $\pm$ 0.02 & 4.66 $\pm$ 0.15 & 0.77 $\pm$ 0.02 \\
 \bottomrule
+\multicolumn{7}{p{14cm}}{\footnotesize Mean $\pm$ s.e.\ over 30 seeds. Bold marks the best mean in each setting (coverage: closest to 0.95); it is descriptive only, without a significance test. Legacy outputs (code of commit 4814dca, old VI-$t$ stopping rule; the corrected code changes VI-$t$ RMSE by at most $6\times10^{-10}$, see audit/release\_table.txt). Laplace-$t$ intervals are not all equally trustworthy: 55 of the 240 Laplace-$t$ fits on this problem are flagged (26 unreliable), 40 of them for a near-singular Hessian (min eig$(B)<10^{-2}$), whose intervals are much wider (results/reliability\_flags.csv).} \\
 \end{tabular}

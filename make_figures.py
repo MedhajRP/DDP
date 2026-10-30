@@ -4,6 +4,8 @@ Usage: py make_figures.py        (skips a study whose CSV does not exist yet)
 Outputs: figures/*.pdf, tables/*.tex
 Summaries: mean +/- standard error over seeds for RMSE/NLPD/coverage; median [IQR] for
 regret (heavy-tailed across seeds). Paired comparisons use the matched seeds.
+Every table ends with a note row: legacy code version, descriptive meaning of the bold entries,
+exploratory status of the BO comparisons, and the flagged Laplace-t fits (mail of 28 Oct).
 """
 import os
 
@@ -44,6 +46,37 @@ def bold_best(cells, vals, lower=True):
     return cells
 
 
+def note_row(ncol, text):
+    """Qualification note printed under a table (mail of 28 Oct, items 2 and 3)."""
+    return r"\multicolumn{" + str(ncol) + r"}{p{14cm}}{\footnotesize " + text + r"} \\"
+
+
+def regression_note(p):
+    text = (r"Mean $\pm$ s.e.\ over 30 seeds. Bold marks the best mean in each setting (coverage: closest "
+            r"to 0.95); it is descriptive only, without a significance test. Legacy outputs (code of commit "
+            r"4814dca, old VI-$t$ stopping rule; the corrected code changes VI-$t$ RMSE by at most "
+            r"$6\times10^{-10}$, see audit/release\_table.txt).")
+    path = os.path.join(RES, "reliability_flags.csv")
+    if os.path.exists(path):
+        fl = pd.read_csv(path)
+        lap = fl[(fl.study == "A") & (fl.model == "Laplace-t") & (fl.problem == p)]
+        eig = lap.rules.str.contains("min eig", regex=False).sum()
+        text += (f" Laplace-$t$ intervals are not all equally trustworthy: {len(lap)} of the "
+                 f"{len(NLABEL) * 30} Laplace-$t$ fits on this problem are flagged "
+                 f"({int((lap.level == 'unreliable').sum())} unreliable), {eig} of them for a near-singular "
+                 r"Hessian (min eig$(B)<10^{-2}$), whose intervals are much wider "
+                 r"(results/reliability\_flags.csv).")
+    return text
+
+
+BO_NOTE = (r"Final simple regret after 50 evaluations, median [IQR] over 20 matched seeds. Bold marks the "
+           r"smallest median in the noise setting and is descriptive only. Each cell is a whole BO policy "
+           r"(surrogate, acquisition path and recommendation together); the differences are not attributed "
+           r"causally to the acquisition path. Exploratory: the 14 selected contrasts (Cont.~10\%) were chosen "
+           r"after the results had been seen, and none has a Holm-adjusted $p<0.05$ (smallest 0.0591). "
+           r"Legacy outputs (code of commit 4814dca), see audit/release\_table.txt.")
+
+
 # ------------------------------------------------------------------ Study A ----------
 def regression():
     path = os.path.join(RES, "regression.csv")
@@ -67,6 +100,7 @@ def regression():
                 lab = NLABEL[nz] if j == 0 else ""
                 lines.append(f"{lab} & {TEXM[mo]} & " + " & ".join(cols[m][j] for m, _, _ in metrics) + r" \\")
             lines.append(r"\midrule" if nz != list(NLABEL)[-1] else r"\bottomrule")
+        lines.append(note_row(2 + len(metrics), regression_note(p)))
         lines.append(r"\end{tabular}")
         with open(os.path.join(TAB, f"regression_{p}.tex"), "w") as fh:
             fh.write("\n".join(lines) + "\n")
@@ -118,6 +152,7 @@ def bo():
                     cells.append("\\textbf{" + c + "}" if (mo, i) == best else c)
                 lines.append(f"{NLABEL[nz] if j == 0 else ''} & {TEXM[mo]} & " + " & ".join(cells) + r" \\")
             lines.append(r"\midrule" if nz != noises[-1] else r"\bottomrule")
+        lines.append(note_row(5, BO_NOTE))
         lines.append(r"\end{tabular}")
         with open(os.path.join(TAB, f"bo_regret_{p}.tex"), "w") as fh:
             fh.write("\n".join(lines) + "\n")

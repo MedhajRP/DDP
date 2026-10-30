@@ -1,0 +1,96 @@
+Phase-1 release table: code versions, status of the outputs, and effect of the VI-t correction
+====================================================================================================
+1. Immutable code versions
+   4814dca63cd5dc0e4a50fb119bc061a8c4f1efd0  2026-10-21 13:31 +0530  reference (legacy) code; old VI-t stopping rule; robustbo/ = bd188d9, which produced the primary results
+   48d12de979cc4d89c2ff17c7b9c8bf86b5e47df7  2026-10-25 00:25 +0530  corrected code; VI-t stopping rule |dELBO| < tol, ELBO traces, opt_log; no tracked .pyc
+   1334bb43a47cb235924671ac948b8e1d3f59d824  2026-10-25 00:30 +0530  adds audit/clean_48d12de only (no code or result change)
+
+2. Status of the outputs (LEGACY = produced by the 4814dca code with the old VI-t rule)
+   - results/regression.csv, bo_final.csv, bo_curves.csv, log_regression.txt, log_bo.txt
+       produced by: code of bd188d9 = 4814dca;  status: LEGACY: the reported Study A / B results; not overwritten
+   - results/regression_paired_tests.csv, bo_paired_tests.csv, bo_surrogate_summary.csv; figures/regression_vs_eps.pdf, bo_curves_ybest.pdf, bo_curves_muobs.pdf, bo_interaction.pdf
+       produced by: derived from the legacy files;  status: LEGACY-DERIVED
+   - tables/*.tex
+       produced by: derived from the legacy files;  status: LEGACY-DERIVED; regenerated in this reconciliation only to add the qualification note (all numbers unchanged)
+   - results/bo_contrasts.csv, bo_primary_contrasts.csv, bo_contrasts_summary.txt; figures/bo_contrast_distribution.pdf
+       produced by: scripts of 48d12de on the legacy bo_final.csv;  status: LEGACY-DERIVED
+   - results/calibration_check.csv, calibration_check_summary.txt, verify_gp.txt; figures/verify_gp.pdf
+       produced by: 48d12de; exact GP (verify_gp: no VI-t number changed);  status: SAME under both versions; calibration summary regenerated in this reconciliation with moderated wording (numbers unchanged); its last table reads the legacy regression.csv
+   - results/vi_elbo_studyA.csv, vi_elbo_studyB.csv, vi_elbo_traces.csv, laplace_studyA_hessian.csv, init_sensitivity.csv, approx_vs_numerics.csv, posterior_checks_summary.txt; figures/vi_elbo_traces.pdf
+       produced by: 48d12de;  status: CORRECTED code
+   - results/fixed_data_regrets.csv, fixed_data_contrasts.csv, fixed_data_summary.txt
+       produced by: 48d12de;  status: CORRECTED code (the BO runs are re-run, not read from bo_final.csv)
+   - audit/audit_report.txt, checksums.csv, pytest_output.txt, smoke_stdout.txt, bo_*_smoke.csv
+       produced by: repro_audit.py, before 4814dca;  status: LEGACY audit (superseded by audit/clean_4814dca)
+   - audit/clean_4814dca/*
+       produced by: clean checkout of 4814dca;  status: audit evidence of 4814dca
+   - audit/clean_48d12de/*
+       produced by: clean checkout of 48d12de (committed in 1334bb4);  status: audit evidence of 48d12de; compares with the LEGACY stored values
+   - results/vi_corrected_runs.csv, audit/release_table.txt, results/reliability_flags.csv, results/reliability_flags_summary.txt
+       produced by: this reconciliation, code of 48d12de;  status: CORRECTED code
+
+3. Clean-checkout audits against the stored (legacy) values
+   4814dca: 1008 / 1008 stored values bit-identical
+   48d12de: 988 / 1008 stored values bit-identical; 20 differ, all in ['branin/sym10/VI-t/mu_obs/seed 0'] (max |diff| 7.1e-04)
+   -> 4814dca reproduces the legacy values bit-identically. 48d12de does NOT: the corrected
+      implementation is not bit-identical to the legacy results.
+
+4. Study A (regression.csv) under the corrected code
+   VI-t     : 480 fits refitted with the corrected code (vi_elbo_studyA.csv); max |d rmse| 6.0e-10, max |d cov_f| 0.0e+00, max |d sigma| 3.4e-12; fits with |d rmse| > 1e-12: 1
+   Laplace-t: 480 fits refitted with the corrected code (laplace_studyA_hessian.csv); max |d rmse| 0.0e+00; fits with |d rmse| > 1e-12: 0
+
+5. Study B VI-t runs with a corrected-code result (results/vi_corrected_runs.csv)
+   posterior_checks.py         : 126 runs, changed (|diff| > 1e-12): 3
+   fixed_data_contrasts.py     :  34 runs, changed (|diff| > 1e-12): 1
+   release_reconciliation.py   :  34 runs, changed (|diff| > 1e-12): 0
+   total 194 of 840 VI-t runs (34 re-run here); the 6 runs present in two sources agree to 0.0e+00
+   changed runs: 4; max |final regret diff| 3.9e-03
+     branin/gaussian/VI-t/mu_obs/seed 0: legacy 0.201894 -> corrected 0.205843 (+3.9e-03)
+     branin/gaussian/VI-t/mu_global/seed 0: legacy 0.251791 -> corrected 0.248896 (-2.9e-03)
+     branin/sym10/VI-t/mu_obs/seed 0: legacy 0.204268 -> corrected 0.204979 (+7.1e-04)
+     branin/sym10/VI-t/mu_obs/seed 5: legacy 0.032112 -> corrected 0.032170 (+5.7e-05)
+   the other 646 VI-t runs exist only as legacy values (not re-run)
+
+6. Reported Study B conclusions: legacy vs with the corrected VI-t values
+   check: recomputation on the legacy file reproduces bo_contrasts.csv (max |d p| 8.8e-17) and bo_paired_tests.csv (max |d p| 8.7e-17)
+   (a) the 14 selected contrasts (sym10), now completely on corrected-code values
+       problem A vs B                 fixed     med d legacy  corrected  p legacy corrected Holm14 legacy corrected
+       branin  Laplace-t vs GP        y_best         -0.0042    -0.0042   0.72851   0.72851        1.0000    1.0000
+       branin  VI-t vs GP             y_best         -0.0067    -0.0067   0.89832   0.89832        1.0000    1.0000
+       branin  Laplace-t vs GP        mu_obs         -0.0462    -0.0462   0.02664   0.02664        0.2664    0.2664
+       branin  VI-t vs GP             mu_obs         -0.0458    -0.0458   0.00422   0.00422        0.0591    0.0591
+       branin  mu_obs vs y_best       GP              0.0304     0.0304   0.08969   0.08969        0.8073    0.8073
+       branin  mu_obs vs y_best       Laplace-t       0.0150     0.0150   0.45238   0.45238        1.0000    1.0000
+       branin  mu_obs vs y_best       VI-t           -0.0134    -0.0134   0.45238   0.45238        1.0000    1.0000
+       camel   Laplace-t vs GP        y_best         -0.0707    -0.0707   0.86949   0.86949        1.0000    1.0000
+       camel   VI-t vs GP             y_best         -0.2137    -0.2137   0.34881   0.34881        1.0000    1.0000
+       camel   Laplace-t vs GP        mu_obs         -0.2096    -0.2096   0.01362   0.01362        0.1498    0.1498
+       camel   VI-t vs GP             mu_obs         -0.2097    -0.2097   0.00486   0.00486        0.0632    0.0632
+       camel   mu_obs vs y_best       GP              0.0097     0.0097   0.75617   0.75617        1.0000    1.0000
+       camel   mu_obs vs y_best       Laplace-t      -0.1763    -0.1763   0.00730   0.00730        0.0875    0.0875
+       camel   mu_obs vs y_best       VI-t           -0.0256    -0.0256   0.26110   0.26110        1.0000    1.0000
+       Holm-adjusted p < 0.05: legacy 0, corrected 0; smallest Holm p: legacy 0.0591, corrected 0.0591; nominal p < 0.05: legacy 5, corrected 5
+   (b) all 252 contrasts (partly corrected: only the VI-t runs of section 5)
+       legacy    : nominal p < 0.05:  41   BH q < 0.05:   8   Holm < 0.05:   2
+       corrected : nominal p < 0.05:  41   BH q < 0.05:   8   Holm < 0.05:   2
+       contrasts whose p changed: 2, whose median difference changed: 0; largest |d p| 0.0257
+         branin/gaussian VI-t vs GP (fixed mu_obs): p 0.5958 -> 0.6215, BH q 0.8729 -> 0.8950, Holm 1.0000 -> 1.0000
+         branin/sym10 VI-t vs Laplace-t (fixed mu_obs): p 0.1140 -> 0.1231, BH q 0.3830 -> 0.4028, Holm 1.0000 -> 1.0000
+   (c) the 112 comparisons with GP + y_best (bo_paired_tests.csv; partly corrected)
+       legacy    : nominal p < 0.05:  26   BH q < 0.05:  15   Holm < 0.05:   5
+       corrected : nominal p < 0.05:  26   BH q < 0.05:  15   Holm < 0.05:   5
+       comparisons whose p changed: 0; largest |d p| 0.0000
+   (d) the six rows of the README results table (alternative vs GP + y_best)
+       branin/student_t/VI-t/y_best     median 0.031 -> 0.031, win 0.85 -> 0.85, p 0.000105 -> 0.000105, Holm(112) 0.0116 -> 0.0116; 3/20 VI-t seeds with corrected-code values
+       branin/down10/Laplace-t/mu_obs   median 0.030 -> 0.030, win 0.85 -> 0.85, p 0.001690 -> 0.001690, Holm(112) 0.1741 -> 0.1741; no VI-t run involved
+       camel/sym10/Laplace-t/mu_obs     median 0.105 -> 0.105, win 0.90 -> 0.90, p 0.002325 -> 0.002325, Holm(112) 0.2372 -> 0.2372; no VI-t run involved
+       camel/down10/Laplace-t/mu_obs    median 0.109 -> 0.109, win 0.85 -> 0.85, p 0.000483 -> 0.000483, Holm(112) 0.0516 -> 0.0516; no VI-t run involved
+       camel/sym20/VI-t/mu_global       median 0.247 -> 0.247, win 0.70 -> 0.70, p 0.010689 -> 0.010689, Holm(112) 1.0000 -> 1.0000; 3/20 VI-t seeds with corrected-code values
+       camel/down20/VI-t/mu_obs         median 0.164 -> 0.164, win 0.65 -> 0.65, p 0.023951 -> 0.023951, Holm(112) 1.0000 -> 1.0000; 3/20 VI-t seeds with corrected-code values
+
+7. Effect on the reported study conclusions
+   - Study A: none (VI-t RMSE changes by at most the value in section 4; Laplace-t and GP unchanged).
+   - Study B, selected family: 0 of 14 Holm-adjusted p < 0.05 with the corrected values (legacy 0); smallest Holm p 0.0591 (legacy 0.0591).
+   - Study B, 252 / 112 families: counts of significant contrasts as in section 6 (b), (c); these use corrected values for 194 of 840 VI-t runs only.
+   - The legacy files stay the reported results. Numbers from the corrected code are not called
+     bit-identical to them; they are reported separately in this file and in vi_corrected_runs.csv.

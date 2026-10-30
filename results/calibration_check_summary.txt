@@ -26,8 +26,10 @@ gp_prior control_true       0.520  0.811  0.908  0.955     0.006  0.992        0
          control_true_n120  0.496  0.796  0.898  0.946     0.006  0.989        0.942       0.953    1.022      0.480   0.070      0.100
          control_est_n120   0.490  0.791  0.895  0.945     0.006  0.988        0.941       0.950    1.046      0.494   0.071      0.101
 
-Controlled assessment of the 95% latent under-coverage (mean Cov95 over 30 seeds;
-each row changes ONE factor relative to the baseline in brackets; change in parentheses)
+One-factor-at-a-time diagnostic comparisons of the 95% latent under-coverage (mean Cov95 over
+30 seeds; each row changes ONE factor relative to the baseline in brackets; change in parentheses).
+These are diagnostics, not a unique causal decomposition into estimation, model-specification and
+finite-sample effects: the factors interact, so the changes depend on the baseline and do not add up.
   factor changed                                                           Branin            Camel
   none: Study A reference, n = 30, theta estimated (2 restarts)             0.892            0.668
   optimiser: 20 random restarts instead of 2            [ref]      0.892 (+0.000)   0.650 (-0.017)
@@ -41,6 +43,14 @@ each row changes ONE factor relative to the baseline in brackets; change in pare
   interior / boundary-band Cov95 with dense theta: branin 0.949 / 0.910, camel 0.933 / 0.806
   dense hyperparameters (original units): branin: ell = (0.290, 1.669), sf = 375.51, sigma = 0.501; camel: ell = (0.213, 0.448), sf = 189.13, sigma = 0.477
   well-specified control (f from the assumed GP prior), mean Cov95: n = 30: true theta 0.955, estimated 0.843, n = 60: true theta 0.957, estimated 0.926, n = 120: true theta 0.946, estimated 0.945
+  not additive: dense theta and n = 120 together change Cov95 by branin +0.018 (the two single changes sum to +0.064), camel +0.188 (the two single changes sum to +0.377)
+
+  Reading (diagnostic): replacing the noisy 30-point hyperparameter estimate by a well-determined one
+  improves coverage substantially (branin +0.043, camel +0.219).
+  The under-coverage that remains, concentrated on the boundary band (branin 0.910 vs 0.949 inside, camel 0.806 vs 0.933 inside),
+  suggests model misspecification (stationary SE kernel); it is not shown to be caused by it alone.
+  All rows are for the exact GP. The robust models implemented here have GP priors with Student-t
+  observation likelihoods; no Student-t process or stable-process prior is implemented or tested.
 
 Study A (existing regression.csv): mean Cov_f and which model is closest to 0.95
 model                 GP  Laplace-t   VI-t    closest

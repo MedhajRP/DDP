@@ -7,6 +7,8 @@ make_figures.py only compares every configuration with GP + y_best. Here:
                           within the SAME surrogate
 For every contrast "A vs B" and matched seed s:  d_s = regret_A(s) - regret_B(s)
 (final simple regret after 50 evaluations; d < 0 means A is better).
+A "surrogate effect" is a descriptive comparison of two whole BO policies (surrogate, acquisition
+path and recommendation change together); it is not a causal attribution.
 
 Reported per contrast:
   med_diff        median of d_s (original regret units)
@@ -174,9 +176,9 @@ def plot_distribution(df, prim):
 
 
 def power_lines(df, n_sim=2000, sizes=(20, 40, 60, 80)):
-    """Prospective plan only (nothing new is simulated): power of the planned confirmatory test
+    """Prospective plan only: power of the planned confirmatory test
     (Wilcoxon, alpha = 0.05 / 4) when the observed 20 paired differences are resampled to n seeds.
-    The effect sizes come from the same, selected data, so these powers are optimistic."""
+    The effect sizes come from the same, selected data."""
     rng = np.random.default_rng(1)
     lines = ["", "Prospective plan: bootstrap power of the planned test (sym10, mu_obs, robust vs GP; "
              "Wilcoxon at alpha = 0.05/4; observed differences resampled; optimistic)"]
@@ -191,9 +193,9 @@ def power_lines(df, n_sim=2000, sizes=(20, 40, 60, 80)):
     return lines
 
 
-def main():
-    df = pd.read_csv(os.path.join(RES, "bo_final.csv"))
-    rng = np.random.default_rng(2026)
+def all_contrasts(df, rng):
+    """All 252 contrasts of one bo_final table, with Holm / BH over all 252 and Holm within the
+    14 selected contrasts (also used by release_reconciliation.py)."""
     rows = []
     for p in sorted(df.problem.unique()):
         for nz in NOISE_ORDER:
@@ -214,6 +216,13 @@ def main():
                       for r in out.itertuples()]
     out["p_holm_primary"] = np.nan
     out.loc[out.primary, "p_holm_primary"] = holm(out.loc[out.primary, "p"])
+    return out
+
+
+def main():
+    df = pd.read_csv(os.path.join(RES, "bo_final.csv"))
+    rng = np.random.default_rng(2026)
+    out = all_contrasts(df, rng)
     out.to_csv(os.path.join(RES, "bo_contrasts.csv"), index=False)
     prim = out[out.primary]
     prim.to_csv(os.path.join(RES, "bo_primary_contrasts.csv"), index=False)
@@ -234,7 +243,7 @@ def main():
              f"  selected family     nominal p<0.05: {int((prim.p < 0.05).sum()):3d} / {len(prim)}   "
              f"Holm (within 14): {int((prim.p_holm_primary < 0.05).sum()):3d}",
              "",
-             "All contrasts are exploratory. The 14 'selected' contrasts were chosen from the design,",
+             "All contrasts are exploratory. The 14 selected contrasts were chosen from the design,",
              "but not documented before the results were seen, so they are not preregistered hypotheses.",
              "",
              "Selected contrasts (sym10). d = regret(A) - regret(B); negative favours A.",

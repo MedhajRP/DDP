@@ -1,0 +1,110 @@
+study,problem,noise,seed,model,incumbent,level,rules,reasons
+A,branin,down20,0,GP,,unreliable,restarts,"[unreliable] optimum 2.75 nats worse than the best start (dRMSE +6.34, dCov +0.100)"
+A,camel,down20,6,GP,,unreliable,restarts,"[unreliable] optimum 1.46 nats worse than the best start (dRMSE +0.90, dCov +0.058)"
+A,camel,down20,8,GP,,unreliable,restarts,"[unreliable] optimum 0.42 nats worse than the best start (dRMSE +2.67, dCov -0.027)"
+A,camel,gaussian,3,GP,,unreliable,restarts,"[unreliable] optimum 4.64 nats worse than the best start (dRMSE -4.45, dCov +0.451)"
+A,camel,gaussian,6,GP,,caution,restarts,"[caution] optimum 1.06 nats worse than the best start (dRMSE +0.24, dCov +0.038)"
+A,camel,student_t,6,GP,,caution,restarts,"[caution] optimum 0.47 nats worse than the best start (dRMSE +0.98, dCov +0.038)"
+A,camel,sym10,6,GP,,caution,restarts,"[caution] optimum 0.32 nats worse than the best start (dRMSE -0.04, dCov +0.032)"
+A,camel,sym10,9,GP,,unreliable,restarts,"[unreliable] optimum 3.46 nats worse than the best start (dRMSE -6.43, dCov +0.232)"
+A,branin,down10,12,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 9.7e-03
+A,branin,down10,23,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 3.1e-05
+A,branin,down10,27,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.6e-04
+A,branin,down20,6,Laplace-t,,unreliable,restarts,"[unreliable] optimum 4.21 nats worse than the best start (dRMSE +10.99, dCov -0.197)"
+A,branin,down20,7,Laplace-t,,unreliable,jitter; min eig(B); restarts,"[caution] min eig(B) = 2.0e-03; [unreliable] variance changes by a factor up to 62.01 for jitter 1e-6 -> 1e-8; [caution] optimum 1.92 nats worse than the best start (dRMSE -0.06, dCov -0.004)"
+A,branin,down20,12,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 9.2e-03
+A,branin,gaussian,1,Laplace-t,,unreliable,jitter,[unreliable] variance changes by a factor up to 1.22 for jitter 1e-6 -> 1e-8
+A,branin,student_t,2,Laplace-t,,unreliable,restarts,"[unreliable] optimum 1.73 nats worse than the best start (dRMSE -1.35, dCov -0.001)"
+A,branin,sym05,1,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.3e-03
+A,branin,sym05,7,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 3.4e-05
+A,branin,sym05,16,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 6.4e-04
+A,branin,sym05,19,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 3.8e-04
+A,branin,sym05,22,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 6.2e-03
+A,branin,sym05,26,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.0e-04
+A,branin,sym05,27,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.3e-04
+A,branin,sym10,0,Laplace-t,,unreliable,restarts,"[unreliable] optimum 0.39 nats worse than the best start (dRMSE -5.58, dCov +0.302)"
+A,branin,sym10,6,Laplace-t,,unreliable,restarts,"[unreliable] optimum 1.48 nats worse than the best start (dRMSE +6.46, dCov -0.133)"
+A,branin,sym10,7,Laplace-t,,unreliable,restarts; second mode,"[caution] warm and cold mode searches differ (d_mu = 0.43); [unreliable] optimum 1.37 nats worse than the best start (dRMSE -1.08, dCov -0.003)"
+A,branin,sym10,16,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 6.4e-04
+A,branin,sym10,19,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 3.8e-04
+A,branin,sym10,23,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.9e-03
+A,branin,sym10,26,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.0e-04
+A,branin,sym10,27,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.9e-03
+A,branin,sym20,7,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.3e-03
+A,branin,sym30,27,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 6.0e-04
+A,camel,down10,4,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.0e-03
+A,camel,down10,7,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.5e-03
+A,camel,down10,9,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 4.5e-04
+A,camel,down10,13,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 1.8e-05
+A,camel,down10,17,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 5.2e-03
+A,camel,down10,28,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.3e-03
+A,camel,down20,0,Laplace-t,,unreliable,restarts,"[unreliable] optimum 2.41 nats worse than the best start (dRMSE -4.57, dCov -0.129)"
+A,camel,down20,4,Laplace-t,,unreliable,jitter,[unreliable] variance changes by a factor up to 1.12 for jitter 1e-6 -> 1e-8
+A,camel,down20,5,Laplace-t,,caution,restarts,"[caution] optimum 0.44 nats worse than the best start (dRMSE +0.08, dCov -0.020)"
+A,camel,down20,7,Laplace-t,,unreliable,jitter; min eig(B); restarts,"[caution] min eig(B) = 3.3e-03; [unreliable] variance changes by a factor up to 1.13 for jitter 1e-6 -> 1e-8; [caution] optimum 1.44 nats worse than the best start (dRMSE +1.00, dCov -0.032)"
+A,camel,down20,12,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.3e-03
+A,camel,down20,13,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 1.8e-05
+A,camel,down20,20,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 7.7e-04
+A,camel,down20,22,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 8.7e-03
+A,camel,gaussian,3,Laplace-t,,unreliable,restarts,"[unreliable] optimum 0.56 nats worse than the best start (dRMSE -4.38, dCov +0.378)"
+A,camel,gaussian,4,Laplace-t,,unreliable,restarts; second mode,"[caution] warm and cold mode searches differ (d_mu = 0.11); [unreliable] optimum 3.69 nats worse than the best start (dRMSE +0.33, dCov -0.280)"
+A,camel,gaussian,6,Laplace-t,,unreliable,restarts,"[unreliable] optimum 0.22 nats worse than the best start (dRMSE -5.21, dCov -0.260)"
+A,camel,gaussian,7,Laplace-t,,unreliable,restarts,"[unreliable] optimum 2.50 nats worse than the best start (dRMSE -3.71, dCov -0.104)"
+A,camel,gaussian,9,Laplace-t,,unreliable,restarts,"[unreliable] optimum 3.67 nats worse than the best start (dRMSE +14.24, dCov -0.167)"
+A,camel,gaussian,13,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.5e-04
+A,camel,gaussian,15,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.4e-03
+A,camel,gaussian,16,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.9e-03
+A,camel,gaussian,20,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 3.1e-03
+A,camel,gaussian,21,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 1.9e-05
+A,camel,gaussian,24,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.1e-04
+A,camel,student_t,0,Laplace-t,,unreliable,min eig(B); restarts; second mode,"[caution] min eig(B) = 7.5e-03; [caution] warm and cold mode searches differ (d_mu = 0.02); [unreliable] optimum 0.79 nats worse than the best start (dRMSE -2.13, dCov -0.018)"
+A,camel,student_t,2,Laplace-t,,unreliable,restarts,"[unreliable] optimum 3.25 nats worse than the best start (dRMSE -2.70, dCov -0.140)"
+A,camel,student_t,5,Laplace-t,,unreliable,restarts,"[unreliable] optimum 1.63 nats worse than the best start (dRMSE +8.63, dCov +0.309)"
+A,camel,student_t,6,Laplace-t,,unreliable,restarts,"[unreliable] optimum 4.35 nats worse than the best start (dRMSE -1.62, dCov -0.240)"
+A,camel,student_t,7,Laplace-t,,unreliable,restarts,"[unreliable] optimum 2.94 nats worse than the best start (dRMSE -2.51, dCov -0.109)"
+A,camel,student_t,9,Laplace-t,,unreliable,restarts,"[unreliable] optimum 2.53 nats worse than the best start (dRMSE +15.26, dCov -0.072)"
+A,camel,student_t,15,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 5.2e-05
+A,camel,sym05,11,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.5e-04
+A,camel,sym05,12,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 6.3e-04
+A,camel,sym05,13,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.5e-04
+A,camel,sym05,15,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 4.2e-03
+A,camel,sym05,21,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 1.9e-05
+A,camel,sym10,0,Laplace-t,,unreliable,restarts,"[unreliable] optimum 2.69 nats worse than the best start (dRMSE -0.04, dCov -0.139)"
+A,camel,sym10,1,Laplace-t,,unreliable,restarts,"[unreliable] optimum 0.80 nats worse than the best start (dRMSE -3.58, dCov -0.011)"
+A,camel,sym10,4,Laplace-t,,unreliable,jitter; min eig(B); restarts,"[caution] min eig(B) = 5.0e-03; [unreliable] variance changes by a factor up to 2.02 for jitter 1e-6 -> 1e-8; [caution] optimum 0.25 nats worse than the best start (dRMSE +0.20, dCov -0.041)"
+A,camel,sym10,6,Laplace-t,,unreliable,jitter; min eig(B),[caution] min eig(B) = 2.6e-03; [unreliable] variance changes by a factor up to 2.64 for jitter 1e-6 -> 1e-8
+A,camel,sym10,9,Laplace-t,,unreliable,jitter; min eig(B),[caution] min eig(B) = 2.7e-03; [unreliable] variance changes by a factor up to 1.15 for jitter 1e-6 -> 1e-8
+A,camel,sym10,11,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.5e-04
+A,camel,sym10,13,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 3.6e-03
+A,camel,sym10,22,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.9e-03
+A,camel,sym20,0,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 7.8e-03
+A,camel,sym20,10,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.7e-04
+A,camel,sym20,12,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.5e-04
+A,camel,sym20,13,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 3.6e-03
+A,camel,sym20,15,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 3.5e-05
+A,camel,sym20,16,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 4.9e-04
+A,camel,sym20,19,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 1.5e-04
+A,camel,sym30,9,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 2.9e-04
+A,camel,sym30,15,Laplace-t,,unreliable,min eig(B),[unreliable] min eig(B) = 3.5e-05
+A,camel,sym30,16,Laplace-t,,caution,min eig(B),[caution] min eig(B) = 8.5e-03
+A,branin,down10,11,VI-t,,caution,VI fixed point,"[caution] second VI fixed point (ELBO cold - warm = -2.85, mean differs by up to 9.5 sd)"
+A,branin,down20,0,VI-t,,unreliable,restarts,"[unreliable] optimum 2.90 nats worse than the best start (dRMSE +5.47, dCov +0.046)"
+A,branin,down20,7,VI-t,,unreliable,restarts,"[unreliable] optimum 0.78 nats worse than the best start (dRMSE -1.05, dCov +0.266)"
+A,branin,student_t,7,VI-t,,unreliable,jitter,[unreliable] variance changes by a factor up to 1.94 for jitter 1e-6 -> 1e-8
+A,branin,sym10,0,VI-t,,unreliable,restarts,"[unreliable] optimum 0.62 nats worse than the best start (dRMSE +4.72, dCov -0.031)"
+A,branin,sym10,6,VI-t,,unreliable,restarts,"[unreliable] optimum 3.09 nats worse than the best start (dRMSE +9.23, dCov -0.270)"
+A,camel,down20,5,VI-t,,unreliable,restarts,"[unreliable] optimum 2.42 nats worse than the best start (dRMSE +9.33, dCov +0.063)"
+A,camel,down20,9,VI-t,,unreliable,restarts,"[unreliable] optimum 6.84 nats worse than the best start (dRMSE +13.44, dCov +0.196)"
+A,camel,gaussian,3,VI-t,,unreliable,restarts,"[unreliable] optimum 2.88 nats worse than the best start (dRMSE -4.24, dCov +0.380)"
+A,camel,gaussian,8,VI-t,,caution,restarts,"[caution] optimum 0.32 nats worse than the best start (dRMSE -0.14, dCov +0.038)"
+A,camel,gaussian,9,VI-t,,unreliable,restarts,"[unreliable] optimum 4.08 nats worse than the best start (dRMSE +10.87, dCov +0.203)"
+A,camel,student_t,3,VI-t,,unreliable,restarts,"[unreliable] optimum 0.19 nats worse than the best start (dRMSE -2.63, dCov +0.090)"
+A,camel,student_t,4,VI-t,,unreliable,jitter,[unreliable] variance changes by a factor up to 1.25 for jitter 1e-6 -> 1e-8
+A,camel,student_t,9,VI-t,,unreliable,restarts,"[unreliable] optimum 5.03 nats worse than the best start (dRMSE +11.56, dCov +0.270)"
+A,camel,sym10,9,VI-t,,unreliable,restarts,"[unreliable] optimum 3.74 nats worse than the best start (dRMSE +10.45, dCov +0.198)"
+B,camel,student_t,5,Laplace-t,mu_obs,unreliable,fallback,[unreliable] 1 covariance fallback(s); final regret 0.0029 with the fallback vs 0.0662 with the polished posterior (section 2)
+B,branin,sym10,0,VI-t,mu_obs,caution,VI convergence,[caution] 1 inner loop(s) not converged within max_inner
+B,branin,sym10,0,VI-t,y_best,caution,VI convergence,[caution] 1 inner loop(s) not converged within max_inner
+B,branin,sym10,1,VI-t,y_best,caution,VI convergence,[caution] 1 inner loop(s) not converged within max_inner
+B,camel,down10,0,VI-t,mu_global,caution,VI convergence,[caution] 1 inner loop(s) not converged within max_inner
+B,camel,sym10,1,VI-t,y_best,caution,VI convergence,[caution] 1 inner loop(s) not converged within max_inner

@@ -1,4 +1,4 @@
-"""Reproducibility audit (mail of 14 Oct, item 4).
+"""Reproducibility audit.
 
 What it does (nothing in results/, tables/ or figures/ is written or replaced):
   1. records the Git commit, working-tree status and the software environment;

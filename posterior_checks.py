@@ -1,11 +1,11 @@
-"""Numerical checks of the robust posterior approximations (mail of 21 Oct, item 3).
+"""Numerical checks of the robust posterior approximations.
 Only the existing models (robustbo/) and the existing benchmark settings are used.
 
  1. VI-t ELBO.
     (a) All 480 Study A VI-t fits (same data, seeds and RNG as run_regression.py). Every inner
         coordinate-ascent loop run during the hyperparameter optimisation is logged
-        (VIStudentTGP.inner_log). At the fitted theta the inner loop is re-run from a COLD start
-        (beta reset) and its ELBO trace is checked for monotonicity and convergence. The fitted
+        (VIStudentTGP.inner_log). At the fitted theta the inner loop is re-run from a cold start
+        and its ELBO trace is checked for monotonicity and convergence. The fitted
         metrics are compared with results/regression.csv (effect of the corrected stopping rule).
     (b) Study B VI-t runs for seeds 0-2 (all 2 x 7 noises x 3 incumbents = 126 runs), re-run with
         the current code and the same logging, compared with bo_final.csv / bo_curves.csv.
@@ -15,7 +15,7 @@ Only the existing models (robustbo/) and the existing benchmark settings are use
         point; an independent mode search (trust-region Newton from 22 starts); the clipped-W
         predictive covariance against a direct matrix inverse, its symmetry and positive
         semi-definiteness; the Laplace covariance at the polished mode; VI-t at the same theta;
-        and the whole BO run repeated with the polished (unclipped) Laplace posterior.
+        and the whole BO run repeated with the unclipped Laplace posterior.
     (b) Hessian conditioning (smallest eigenvalue of B = I + L^T W L) of all 480 Study A fits.
  3. Hyperparameter initialisation and optimiser convergence: 80 Study A datasets
     (2 problems x {gaussian, student_t, sym10, down20} x seeds 0-9). Every model is fitted
@@ -23,18 +23,23 @@ Only the existing models (robustbo/) and the existing benchmark settings are use
     RNG. The L-BFGS-B outcome of every start is kept (BaseGP.opt_log).
  4. Numerical instability vs genuine approximation differences, on the same 80 datasets.
     At the Study A theta of each robust model the posterior is recomputed with the jitter changed
-    from 1e-6 to 1e-8 and to 1e-4, and (VI-t) with a 1000x tighter inner tolerance: numerical
-    sensitivity. Laplace-t and VI-t are compared at the SAME theta: approximation difference.
+    from 1e-6 to 1e-8 and to 1e-4, and (VI-t) with a 1000x tighter inner tolerance: numerical.
+    Laplace-t and VI-t are compared at the same theta: approximation difference.
     Laplace-t(theta_L) vs VI-t(theta_V) is the difference reported in Study A, and (3) gives the
     hyperparameter-optimum difference.
 Differences on the 30 x 30 grid: d_mu = max |mu_a - mu_b| / sd (sd = sqrt of the mean of the
 two variances), d_logvar = max |log var_a - log var_b|, and the changes of RMSE and Cov_f.
+ 5. Reliability flags (mail of 28 Oct, point 2): the rules in section 5 below are applied to the
+    CSV files of 1-4 (no refits) and every flagged Study A fit / Study B run is listed with the
+    reason. Run alone with --flags-only.
 
 Writes NEW files only:
   results/posterior_checks_summary.txt, results/vi_elbo_studyA.csv, results/vi_elbo_studyB.csv,
   results/vi_elbo_traces.csv, results/laplace_studyA_hessian.csv, results/init_sensitivity.csv,
-  results/approx_vs_numerics.csv, figures/vi_elbo_traces.pdf
+  results/approx_vs_numerics.csv, figures/vi_elbo_traces.pdf,
+  results/reliability_flags.csv, results/reliability_flags_summary.txt
 Usage: py posterior_checks.py [--workers 11]      (about 15-20 minutes)
+       py posterior_checks.py --flags-only        (section 5 only, a few seconds)
 """
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -80,7 +85,7 @@ def study_a_data(pkey, nkey, seed, n=30):
 
 
 def compare(ma, mb, grid, f_grid):
-    """Grid differences between two fitted models (original units)."""
+    """Grid differences between two fitted models."""
     mu_a, var_a = ma.predict_f(grid)
     mu_b, var_b = mb.predict_f(grid)
     la, lb = latent_metrics(ma, grid, f_grid), latent_metrics(mb, grid, f_grid)
@@ -98,7 +103,7 @@ def inner_summary(m):
 
 
 def min_eig_b(m):
-    """Smallest eigenvalue of B = I + L^T W L with the UNCLIPPED W at the reported mode."""
+    """Smallest eigenvalue of B = I + L^T W L with the unclipped W at the reported mode."""
     s = m._post
     W = -s["derivs"][2]
     return float(np.linalg.eigvalsh(np.eye(m.n) + s["L"].T @ (W[:, None] * s["L"])).min())
@@ -369,7 +374,7 @@ def laplace_fallback(pool):
     fin = pd.read_csv(os.path.join(RES, "bo_final.csv"))
     cell = fin[(fin.problem == pkey) & (fin.noise == nkey) & (fin.model == MODEL_LABELS[mname]) & (fin.incumbent == inc)]
     alt = cell.regret.where(cell.seed != seed, h2["regret"][-1])
-    log(f"       BO run repeated with the polished (unclipped) posterior at the fallback fit: final regret "
+    log(f"       BO run repeated with the unclipped posterior at the fallback fit: final regret "
         f"{h2['regret'][-1]:.4f} instead of {h['regret'][-1]:.4f}; regret curves first differ at iteration {diverge}")
     log(f"       cell median regret (20 seeds) {cell.regret.median():.4f} -> {alt.median():.4f} if this seed used "
         f"the polished posterior")
@@ -514,16 +519,154 @@ def sensitivity(pool):
     log()
 
 
+# ============================================================ 5. reliability flags ========
+# A fit is unreliable when a diagnostic shows that its posterior is not determined to the precision
+# at which it is used (it changes under a choice that should not matter: jitter, start
+# of the inner loop / mode search, number of restarts), or when the reported covariance is not the
+# Laplace posterior at all (fallback). It is caution when a diagnostic warns but the posterior was
+# stable in the checks that were run. A BO run gets the worst flag of its fits, because every later
+# EI decision depends on each fit.
+EIG_UNRELIABLE, EIG_CAUTION = 1e-4, 1e-2   # Laplace-t: smallest eigenvalue of B = I + L^T W L
+LOGVAR_JITTER = 0.1                        # max |log var change| for jitter 1e-6 -> 1e-8
+MODE_DMU = 1e-3                            # warm vs cold Laplace mode (max |mu diff| / sd)
+ELBO_FIXED_POINT = 1e-6                    # |ELBO(cold) - ELBO(warm)|: second VI fixed point
+GAP_NATS = 0.1                             # hyperparameter optimum worse than the best of 18 starts
+GAP_RMSE, GAP_COV = 0.10, 0.05             # ... and its effect: relative RMSE change, |Cov_f change|
+RULES = [
+    ("Laplace-t", "unreliable", "covariance fallback used (clipped W; not the Laplace posterior)", "all fits"),
+    ("Laplace-t", "unreliable", f"min eig(B) < {EIG_UNRELIABLE:.0e} (near-singular Hessian)", "all fits"),
+    ("Laplace-t", "caution", f"{EIG_UNRELIABLE:.0e} <= min eig(B) < {EIG_CAUTION:.0e}", "all fits"),
+    ("Laplace-t", "caution", f"warm- and cold-started mode searches differ (d_mu > {MODE_DMU:.0e})", "80 datasets"),
+    ("VI-t", "unreliable", "inner loop at the fitted theta not converged or with an ELBO decrease", "all fits"),
+    ("VI-t", "caution", f"second fixed point from a cold start (|dELBO| > {ELBO_FIXED_POINT:.0e}); "
+                        "unreliable if the cold start has the HIGHER ELBO", "all fits"),
+    ("Laplace-t, VI-t", "unreliable", f"variance changes by more than a factor exp({LOGVAR_JITTER}) "
+                                      "when the jitter goes 1e-6 -> 1e-8", "80 datasets"),
+    ("all", "caution", f"optimum more than {GAP_NATS} nats worse than the best of 18 starts", "80 datasets"),
+    ("all", "unreliable", f"... and this changes RMSE by more than {100 * GAP_RMSE:.0f}% or Cov_f by more "
+                          f"than {GAP_COV}", "80 datasets"),
+    ("Study B", "unreliable", "BO run with at least one covariance fallback (n_fallback > 0)", "all runs"),
+    ("Study B", "caution", "VI-t BO run with an inner loop not converged within max_inner", "126 re-run runs"),
+]
+
+
+def reliability_flags():
+    """Applies the rules above to the CSV files of sections 1-4 (no refits)."""
+    flags = {}
+
+    def add(key, level, rule, why):
+        flags.setdefault(key, []).append((level, rule, why))
+
+    def key_a(r, model):
+        return ("A", r.problem, r.noise, int(r.seed), model, "")
+
+    hs = pd.read_csv(os.path.join(RES, "laplace_studyA_hessian.csv"))
+    for r in hs.itertuples():
+        if r.fallback:
+            add(key_a(r, "Laplace-t"), "unreliable", "fallback", "covariance fallback")
+        if r.min_eig_b < EIG_UNRELIABLE:
+            add(key_a(r, "Laplace-t"), "unreliable", "min eig(B)", f"min eig(B) = {r.min_eig_b:.1e}")
+        elif r.min_eig_b < EIG_CAUTION:
+            add(key_a(r, "Laplace-t"), "caution", "min eig(B)", f"min eig(B) = {r.min_eig_b:.1e}")
+    va = pd.read_csv(os.path.join(RES, "vi_elbo_studyA.csv"))
+    for r in va.itertuples():
+        if (not r.cold_converged) or r.cold_decrease_steps > 0:
+            add(key_a(r, "VI-t"), "unreliable", "VI convergence", "inner loop not converged / ELBO decrease at the fitted theta")
+        if abs(r.cold_minus_warm_elbo) > ELBO_FIXED_POINT:
+            add(key_a(r, "VI-t"), "unreliable" if r.cold_minus_warm_elbo > 0 else "caution", "VI fixed point",
+                f"second VI fixed point (ELBO cold - warm = {r.cold_minus_warm_elbo:+.2f}, mean differs by "
+                f"up to {r.cold_vs_warm_dmu:.1f} sd)")
+    num = pd.read_csv(os.path.join(RES, "approx_vs_numerics.csv"))
+    ok = ~num.failed.astype(str).eq("True")
+    for r in num[ok & (num.check == "jitter 1e-8")].itertuples():
+        if r.d_logvar > LOGVAR_JITTER:
+            add(key_a(r, r.model), "unreliable", "jitter", f"variance changes by a factor up to {np.exp(r.d_logvar):.2f} "
+                                                 "for jitter 1e-6 -> 1e-8")
+    for r in num[ok & (num.check == "warm vs cold state") & (num.model == "Laplace-t")].itertuples():
+        if r.d_mu > MODE_DMU:
+            add(key_a(r, "Laplace-t"), "caution", "second mode", f"warm and cold mode searches differ (d_mu = {r.d_mu:.2f})")
+    ini = pd.read_csv(os.path.join(RES, "init_sensitivity.csv"))
+    for r in ini.itertuples():
+        if r.obj_gap > GAP_NATS:
+            big = abs(r.d_rmse) / r.rmse_ref > GAP_RMSE or abs(r.d_cov) > GAP_COV
+            add(key_a(r, r.model), "unreliable" if big else "caution", "restarts",
+                f"optimum {r.obj_gap:.2f} nats worse than the best start (dRMSE {r.d_rmse:+.2f}, dCov {r.d_cov:+.3f})")
+    fin = pd.read_csv(os.path.join(RES, "bo_final.csv"))
+    for r in fin[fin.n_fallback > 0].itertuples():
+        add(("B", r.problem, r.noise, int(r.seed), r.model, r.incumbent), "unreliable", "fallback",
+            f"{int(r.n_fallback)} covariance fallback(s); final regret 0.0029 with the fallback vs 0.0662 with "
+            "the polished posterior (section 2)")
+    vb = pd.read_csv(os.path.join(RES, "vi_elbo_studyB.csv"))
+    for r in vb[vb.inner_not_converged > 0].itertuples():
+        add(("B", r.problem, r.noise, int(r.seed), "VI-t", r.incumbent), "caution", "VI convergence",
+            f"{int(r.inner_not_converged)} inner loop(s) not converged within max_inner")
+
+    fl = pd.DataFrame([dict(study=k[0], problem=k[1], noise=k[2], seed=k[3], model=k[4], incumbent=k[5],
+                            level="unreliable" if any(lv == "unreliable" for lv, _, _ in v) else "caution",
+                            rules="; ".join(sorted({ru for _, ru, _ in v})),
+                            reasons="; ".join(f"[{lv}] {w}" for lv, _, w in v)) for k, v in flags.items()])
+    fl = fl.sort_values(["study", "model", "problem", "noise", "seed", "incumbent"])
+    fl.to_csv(os.path.join(RES, "reliability_flags.csv"), index=False)
+    per_rule = pd.DataFrame([dict(model=k[4], rule=ru, level=lv) for k, v in flags.items() if k[0] == "A"
+                             for lv, ru, _ in v])
+
+    out = ["Reliability flags for the robust posterior approximations (rules: posterior_checks.py, section 5)",
+           "UNRELIABLE = the posterior is not determined to the precision at which it is used, or the covariance",
+           "is not the Laplace posterior; CAUTION = a diagnostic warns, but the posterior was stable in the checks run.",
+           "A BO run gets the worst flag of its fits. Unflagged does not mean verified: the restart, jitter and",
+           "mode checks exist only for the 80 sensitivity datasets (gaussian, student_t, sym10, down20; seeds 0-9).",
+           "", "Rules:"]
+    out += [f"  {m:16s} {lv:10s} {why}   [checked on: {where}]" for m, lv, why, where in RULES]
+    out += ["", "Study A fits (480 per model; GP only on the 80 sensitivity datasets):",
+            f"  {'model':10s} {'checked':>8s} {'caution':>8s} {'unreliable':>11s}"]
+    a = fl[fl.study == "A"]
+    for mo, n in (("GP", 80), ("Laplace-t", 480), ("VI-t", 480)):
+        g = a[a.model == mo]
+        out.append(f"  {mo:10s} {n:8d} {int((g.level == 'caution').sum()):8d} {int((g.level == 'unreliable').sum()):11d}")
+    out += ["  number of Study A fits hit by each rule (a fit can be hit by more than one rule):",
+            "  " + per_rule.groupby(["model", "rule", "level"]).size().unstack(fill_value=0).to_string()
+            .replace("\n", "\n  ")]
+    reg = pd.read_csv(os.path.join(RES, "regression.csv"))
+    lap = reg[reg.model == "Laplace-t"].merge(a[a.model == "Laplace-t"][["problem", "noise", "seed", "level"]],
+                                              on=["problem", "noise", "seed"], how="left")
+    lap["level"] = lap.level.fillna("not flagged")
+    eig = hs.set_index(["problem", "noise", "seed"]).min_eig_b
+    lap["near_singular"] = eig.loc[list(zip(lap.problem, lap.noise, lap.seed))].to_numpy() < EIG_CAUTION
+    agg = dict(fits=("cov_f", "size"), mean_cov_f=("cov_f", "mean"), median_width_f=("width_f", "median"))
+    out += ["", "Study A Laplace-t latent intervals by flag (regression.csv; descriptive only, the flagged fits",
+            "are not a random subset):",
+            lap.groupby(["problem", "level"]).agg(**agg).round(3).to_string(),
+            "", f"... and by the Hessian rule alone (near_singular = min eig(B) < {EIG_CAUTION:.0e}):",
+            lap.groupby(["problem", "near_singular"]).agg(**agg).round(3).to_string()]
+    b = fl[fl.study == "B"]
+    out += ["", f"Study B runs flagged: {len(b)} (unreliable {int((b.level == 'unreliable').sum())}, "
+                f"caution {int((b.level == 'caution').sum())})"]
+    out += [f"  {r.problem}/{r.noise}/{r.model}/{r.incumbent}/seed {r.seed}: {r.reasons}" for r in b.itertuples()]
+    out += ["  Note: min eig(B) was not recorded during Study B, and the fallback counter undercounts",
+            f"  near-singular Laplace-t posteriors (Study A: {int((hs.min_eig_b < EIG_CAUTION).sum())} fits with "
+            f"min eig(B) < {EIG_CAUTION:.0e}, {int(hs.fallback.sum())} fallbacks). The other Study B Laplace-t runs can",
+            "  therefore not be screened with the Hessian rule without re-running them.",
+            "", "Every flagged fit / run with its reasons: results/reliability_flags.csv"]
+    text = "\n".join(out)
+    print(text)
+    with open(os.path.join(RES, "reliability_flags_summary.txt"), "w", encoding="utf-8") as fh:
+        fh.write(text + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
+    ap.add_argument("--flags-only", action="store_true",
+                    help="only apply the reliability rules (section 5) to the existing CSV files")
     a = ap.parse_args()
-    with Pool(a.workers) as pool:
-        vi_checks(pool)
-        laplace_fallback(pool)
-        sensitivity(pool)
-    with open(os.path.join(RES, "posterior_checks_summary.txt"), "w", encoding="utf-8") as fh:
-        fh.write("\n".join(lines) + "\n")
+    if not a.flags_only:
+        with Pool(a.workers) as pool:
+            vi_checks(pool)
+            laplace_fallback(pool)
+            sensitivity(pool)
+        with open(os.path.join(RES, "posterior_checks_summary.txt"), "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+    reliability_flags()
 
 
 if __name__ == "__main__":

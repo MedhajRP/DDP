@@ -1,0 +1,67 @@
+Reliability flags for the robust posterior approximations (rules: posterior_checks.py, section 5)
+UNRELIABLE = the posterior is not determined to the precision at which it is used, or the covariance
+is not the Laplace posterior; CAUTION = a diagnostic warns, but the posterior was stable in the checks run.
+A BO run gets the worst flag of its fits. Unflagged does not mean verified: the restart, jitter and
+mode checks exist only for the 80 sensitivity datasets (gaussian, student_t, sym10, down20; seeds 0-9).
+
+Rules:
+  Laplace-t        unreliable covariance fallback used (clipped W; not the Laplace posterior)   [checked on: all fits]
+  Laplace-t        unreliable min eig(B) < 1e-04 (near-singular Hessian)   [checked on: all fits]
+  Laplace-t        caution    1e-04 <= min eig(B) < 1e-02   [checked on: all fits]
+  Laplace-t        caution    warm- and cold-started mode searches differ (d_mu > 1e-03)   [checked on: 80 datasets]
+  VI-t             unreliable inner loop at the fitted theta not converged or with an ELBO decrease   [checked on: all fits]
+  VI-t             caution    second fixed point from a cold start (|dELBO| > 1e-06); unreliable if the cold start has the HIGHER ELBO   [checked on: all fits]
+  Laplace-t, VI-t  unreliable variance changes by more than a factor exp(0.1) when the jitter goes 1e-6 -> 1e-8   [checked on: 80 datasets]
+  all              caution    optimum more than 0.1 nats worse than the best of 18 starts   [checked on: 80 datasets]
+  all              unreliable ... and this changes RMSE by more than 10% or Cov_f by more than 0.05   [checked on: 80 datasets]
+  Study B          unreliable BO run with at least one covariance fallback (n_fallback > 0)   [checked on: all runs]
+  Study B          caution    VI-t BO run with an inner loop not converged within max_inner   [checked on: 126 re-run runs]
+
+Study A fits (480 per model; GP only on the 80 sensitivity datasets):
+  model       checked  caution  unreliable
+  GP               80        3           5
+  Laplace-t       480       45          35
+  VI-t            480        2          13
+  number of Study A fits hit by each rule (a fit can be hit by more than one rule):
+  level                     caution  unreliable
+  model     rule                               
+  GP        restarts              3           5
+  Laplace-t jitter                0           7
+            min eig(B)           50           9
+            restarts              4          19
+            second mode           3           0
+  VI-t      VI fixed point        1           0
+            jitter                0           2
+            restarts              1          11
+
+Study A Laplace-t latent intervals by flag (regression.csv; descriptive only, the flagged fits
+are not a random subset):
+                     fits  mean_cov_f  median_width_f
+problem level                                        
+branin  caution        16       0.987          91.092
+        not flagged   215       0.842           9.848
+        unreliable      9       0.900          25.016
+camel   caution        29       0.845         143.393
+        not flagged   185       0.691          26.713
+        unreliable     26       0.786          48.471
+
+... and by the Hessian rule alone (near_singular = min eig(B) < 1e-02):
+                       fits  mean_cov_f  median_width_f
+problem near_singular                                  
+branin  False           221       0.842           9.861
+        True             19       0.988         176.114
+camel   False           200       0.692          26.439
+        True             40       0.856         192.203
+
+Study B runs flagged: 6 (unreliable 1, caution 5)
+  camel/student_t/Laplace-t/mu_obs/seed 5: [unreliable] 1 covariance fallback(s); final regret 0.0029 with the fallback vs 0.0662 with the polished posterior (section 2)
+  branin/sym10/VI-t/mu_obs/seed 0: [caution] 1 inner loop(s) not converged within max_inner
+  branin/sym10/VI-t/y_best/seed 0: [caution] 1 inner loop(s) not converged within max_inner
+  branin/sym10/VI-t/y_best/seed 1: [caution] 1 inner loop(s) not converged within max_inner
+  camel/down10/VI-t/mu_global/seed 0: [caution] 1 inner loop(s) not converged within max_inner
+  camel/sym10/VI-t/y_best/seed 1: [caution] 1 inner loop(s) not converged within max_inner
+  Note: min eig(B) was not recorded during Study B, and the fallback counter undercounts
+  near-singular Laplace-t posteriors (Study A: 59 fits with min eig(B) < 1e-02, 0 fallbacks). The other Study B Laplace-t runs can
+  therefore not be screened with the Hessian rule without re-running them.
+
+Every flagged fit / run with its reasons: results/reliability_flags.csv

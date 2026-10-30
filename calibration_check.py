@@ -1,6 +1,7 @@
 """Why is the latent 95% coverage of the GP below nominal? (mail of 14 Oct, item 3;
 extended for the mail of 21 Oct, item 4: optimiser, hyperparameter-estimation, finite-sample
-and mean-function effects are now separated, one factor at a time)
+and mean-function effects are now compared one factor at a time; mail of 28 Oct, item 4: these
+comparisons are diagnostic, not a unique causal decomposition, because the factors interact)
 
 Reference numbers (results/regression.csv, GP, Gaussian noise, n = 30, 30 seeds):
 mean Cov_f = 0.892 (Branin) and 0.668 (Six-Hump Camel).
@@ -193,8 +194,10 @@ def assessment(df):
     """Controlled assessment: every row changes ONE factor relative to its baseline (mean Cov95)."""
     c = df.groupby(["problem", "config"])[["cov95", "cov95_inner", "cov95_edge"]].mean()
     probs = ("branin", "camel")
-    lines = ["Controlled assessment of the 95% latent under-coverage (mean Cov95 over 30 seeds;",
-             "each row changes ONE factor relative to the baseline in brackets; change in parentheses)",
+    lines = ["One-factor-at-a-time diagnostic comparisons of the 95% latent under-coverage (mean Cov95 over",
+             "30 seeds; each row changes ONE factor relative to the baseline in brackets; change in parentheses).",
+             "These are diagnostics, not a unique causal decomposition into estimation, model-specification and",
+             "finite-sample effects: the factors interact, so the changes depend on the baseline and do not add up.",
              f"  {'factor changed':62s} {'Branin':>16s} {'Camel':>16s}"]
     rows = [("none: Study A reference, n = 30, theta estimated (2 restarts)", "ref", None),
             ("optimiser: 20 random restarts instead of 2            [ref]", "restarts20", "ref"),
@@ -225,6 +228,20 @@ def assessment(df):
               ", ".join(f"n = {n}: true theta {c.loc[('gp_prior', 'control_true' + t), 'cov95']:.3f}, "
                         f"estimated {c.loc[('gp_prior', 'control_est' + t), 'cov95']:.3f}"
                         for n, t in [(30, ""), (60, "_n60"), (120, "_n120")])]
+    d = {p: c.loc[(p, "dense"), "cov95"] - c.loc[(p, "ref"), "cov95"] for p in probs}
+    n = {p: c.loc[(p, "n120"), "cov95"] - c.loc[(p, "ref"), "cov95"] for p in probs}
+    both = {p: c.loc[(p, "dense_n120"), "cov95"] - c.loc[(p, "ref"), "cov95"] for p in probs}
+    lines += ["  not additive: dense theta and n = 120 together change Cov95 by " +
+              ", ".join(f"{p} {both[p]:+.3f} (the two single changes sum to {d[p] + n[p]:+.3f})" for p in probs),
+              "",
+              "  Reading (diagnostic): replacing the noisy 30-point hyperparameter estimate by a well-determined one",
+              "  improves coverage substantially (" + ", ".join(f"{p} {d[p]:+.3f}" for p in probs) + ").",
+              "  The under-coverage that remains, concentrated on the boundary band (" +
+              ", ".join(f"{p} {c.loc[(p, 'dense'), 'cov95_edge']:.3f} vs {c.loc[(p, 'dense'), 'cov95_inner']:.3f} inside"
+                        for p in probs) + "),",
+              "  suggests model misspecification (stationary SE kernel); it is not shown to be caused by it alone.",
+              "  All rows are for the exact GP. The robust models implemented here have GP priors with Student-t",
+              "  observation likelihoods; no Student-t process or stable-process prior is implemented or tested."]
     return lines
 
 
