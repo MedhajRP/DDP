@@ -1,0 +1,19 @@
+script,exit_code,file,sha256_regenerated,byte_equal_checkout,byte_equal_git_blob,git_normalized_equal,content
+paired_regression.py,0,results/regression_paired_tests.csv,d08638b7bee3a377a822fca4b129e4d6ab6aed5f2fb8435881835a0507dd426e,True,False,True,"96 x 7, max |numeric diff| = 0.0e+00, text columns equal: True"
+make_figures.py,0,results/bo_paired_tests.csv,0879a2ae5fac7bfa3d8244a9ea728b4211ddb9ff0bd6337204844dfd4f192540,True,False,True,"112 x 7, max |numeric diff| = 0.0e+00, text columns equal: True"
+make_figures.py,0,results/bo_surrogate_summary.csv,f189de298cdb3fb07ad6c933c7a6f28111f7fec697d5e945d47fcf046692a4a3,True,False,True,"42 x 9, max |numeric diff| = 0.0e+00, text columns equal: True"
+make_figures.py,0,tables/regression_branin.tex,a346dbc77d146ed2aa773d91d09002515f8b648f4ac68b8e2831d57db599534f,False,False,False,1 differing lines after CRLF -> LF
+make_figures.py,0,tables/regression_camel.tex,2077de0d664ce71cf9df4974ca5f1fd402cd816a694a50882b0a57b7289f2d65,True,False,True,0 differing lines after CRLF -> LF
+make_figures.py,0,tables/bo_regret_branin.tex,7e69735948c166ab54b2b85fb189281ad95565835b915e07808044d656ba455a,True,False,True,0 differing lines after CRLF -> LF
+make_figures.py,0,tables/bo_regret_camel.tex,a48ec144f5c519e684d59cd6ab9c7c58c28aa0e13f0298c0a658f639982d22c9,True,False,True,0 differing lines after CRLF -> LF
+make_figures.py,0,figures/regression_vs_eps.pdf,0525e1aca6c4920be8bfb3ce8ac3a74ee7e68a2b3066164b928fdda439f6d9f1,False,False,False,PDF (embeds a creation time; not compared byte-wise)
+make_figures.py,0,figures/bo_curves_ybest.pdf,ee8fc74625d0d6d9aa5ccc96d7ce5c185c0af36e15fce627bba2d7ef9ce3b0db,False,False,False,PDF (embeds a creation time; not compared byte-wise)
+make_figures.py,0,figures/bo_curves_muobs.pdf,4e26a047641380c0fbca0e4a0c6aaa2eaefc9f9d6bd0f83f8f93dc21680ae0c9,False,False,False,PDF (embeds a creation time; not compared byte-wise)
+make_figures.py,0,figures/bo_interaction.pdf,6057a3b7557ccd0a4e44b60f0c1750d7fefd67b46b6274ccc3c54be77184549f,False,False,False,PDF (embeds a creation time; not compared byte-wise)
+bo_contrasts.py,0,results/bo_contrasts.csv,c9bbdd84ab3dede5c0d3422ba664d473a009574bffc8c79b5913427aedac6bd3,True,False,True,"252 x 32, max |numeric diff| = 0.0e+00, text columns equal: True"
+bo_contrasts.py,0,results/bo_primary_contrasts.csv,b96c95ccb9745824cec7c945f30b2ce65988ff7958b25e07022edb9bc568bd7c,True,False,True,"14 x 32, max |numeric diff| = 0.0e+00, text columns equal: True"
+bo_contrasts.py,0,results/bo_contrasts_summary.txt,8d1a33c34898c17da371d905d6bbd3d7cecd471706baa02d8edb8c8804fa8322,False,False,False,1 differing lines after CRLF -> LF
+calibration_check.py,0,results/calibration_check.csv,d8692501a9871a5d78ed60237f1e0907557ad42338d26512e3b896a2fb32c2b7,True,False,True,"660 x 18, max |numeric diff| = 0.0e+00, text columns equal: True"
+calibration_check.py,0,results/calibration_check_summary.txt,012e5e7b6f9fed21a0a7acbd4947d8e389155b61fd6102552a80f6316173731c,True,False,True,0 differing lines after CRLF -> LF
+verify_gp.py,0,results/verify_gp.txt,a6bed9dd51cfc7f469f769d44a1c9b1f5b73063801e61cc9f97efc94e582416f,True,False,True,0 differing lines after CRLF -> LF
+verify_gp.py,0,figures/verify_gp.pdf,6b3f1c4fde30d92c53d51fd7a734173404791c40498d5da3d4cec56e2184e45e,False,False,False,PDF (embeds a creation time; not compared byte-wise)
