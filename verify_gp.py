@@ -132,6 +132,6 @@ for ax, cls in zip(axes, [ExactGP, LaplaceStudentTGP, VIStudentTGP]):
 axes[0].set_ylabel("y")
 axes[0].legend(fontsize=7, loc="lower left")
 fig.tight_layout()
-fig.savefig(os.path.join(HERE, "figures", "verify_gp.pdf"))
+fig.savefig(os.path.join(HERE, "figures", "verify_gp.pdf"), metadata={"CreationDate": None})
 with open(os.path.join(HERE, "results", "verify_gp.txt"), "w") as fh:
     fh.write("\n".join(lines) + "\n")

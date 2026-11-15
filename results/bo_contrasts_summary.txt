@@ -26,6 +26,26 @@ camel   incumbent mu_obs vs y_best       GP          0.272   0.724   0.010 [ -0.
 camel   incumbent mu_obs vs y_best       Laplace-t   0.105   0.410  -0.176 [ -0.593,  -0.032]  0.85  -0.67  0.00730  0.0875
 camel   incumbent mu_obs vs y_best       VI-t        0.127   0.120  -0.026 [ -0.416,   0.059]  0.55  -0.30  0.26110  1.0000
 
+Post-hoc sensitivity check: exact two-sided sign test on the same 14 selected contrasts
+(H0: P(d < 0) = P(d > 0), ties dropped; no symmetry assumption). Exploratory and post hoc:
+NOT confirmatory evidence. It shows that the conclusion depends on the estimand and the test.
+problem A vs B                 fixed      d<0  d!=0      p sign      Holm14  p Wilcoxon   Holm14
+branin  Laplace-t vs GP        y_best      12    20 0.503444672 1.000000000    0.728506   1.0000
+branin  VI-t vs GP             y_best      11    20 0.823802948 1.000000000    0.898317   1.0000
+branin  Laplace-t vs GP        mu_obs      15    20 0.041389465 0.496673584    0.026642   0.2664
+branin  VI-t vs GP             mu_obs      15    20 0.041389465 0.496673584    0.004221   0.0591
+branin  mu_obs vs y_best       GP           7    20 0.263175964 1.000000000    0.089695   0.8073
+branin  mu_obs vs y_best       Laplace-t    9    20 0.823802948 1.000000000    0.452375   1.0000
+branin  mu_obs vs y_best       VI-t        12    20 0.503444672 1.000000000    0.452375   1.0000
+camel   Laplace-t vs GP        y_best      11    20 0.823802948 1.000000000    0.869488   1.0000
+camel   VI-t vs GP             y_best      15    20 0.041389465 0.496673584    0.348810   1.0000
+camel   Laplace-t vs GP        mu_obs      15    20 0.041389465 0.496673584    0.013617   0.1498
+camel   VI-t vs GP             mu_obs      16    20 0.011817932 0.153633118    0.004860   0.0632
+camel   mu_obs vs y_best       GP          10    20 1.000000000 1.000000000    0.756166   1.0000
+camel   mu_obs vs y_best       Laplace-t   17    20 0.002576828 0.036075592    0.007296   0.0875
+camel   mu_obs vs y_best       VI-t        11    20 0.823802948 1.000000000    0.261099   1.0000
+  sign test: nominal p < 0.05 in 6 / 14, Holm(14) < 0.05 in 1 (smallest 0.036075592); Wilcoxon Holm(14) < 0.05 in 0
+
 Distribution of the 20 paired differences d_s for the selected contrasts (loss = fraction of seeds with d_s > 0)
 problem A vs B                 fixed         min     q10     q25  median     q75     q90     max    mean   win  loss
 branin  Laplace-t vs GP        y_best     -0.258  -0.213  -0.069  -0.004   0.026   0.104   0.222  -0.019  0.60  0.40
@@ -96,11 +116,11 @@ Robust surrogate (Laplace-t or VI-t) vs GP at the same incumbent, all settings: 
     camel   sym20     VI-t      at mu_obs    med d =  -0.126  loss = 0.30  q90  3.105 vs  2.054  max  3.336 vs  3.335  p = 0.245
     camel   sym20     Laplace-t at y_best    med d =   0.120  loss = 0.60  q90  2.597 vs  3.149  max  6.493 vs  3.428  p = 0.927
 
-Prospective plan: bootstrap power of the planned test (sym10, mu_obs, robust vs GP; Wilcoxon at alpha = 0.05/4; observed differences resampled; optimistic)
-  branin  Laplace-t vs GP  n = 20: 0.42  n = 40: 0.79  n = 60: 0.94  n = 80: 0.99
-  branin  VI-t vs GP       n = 20: 0.68  n = 40: 0.98  n = 60: 1.00  n = 80: 1.00
-  camel   Laplace-t vs GP  n = 20: 0.53  n = 40: 0.89  n = 60: 0.98  n = 80: 1.00
-  camel   VI-t vs GP       n = 20: 0.70  n = 40: 0.98  n = 60: 1.00  n = 80: 1.00
+Prospective plan: bootstrap power of the planned test (sym10, mu_obs, robust vs GP; exact two-sided sign test, ties dropped, at alpha = 0.05/4; observed differences resampled; optimistic)
+  branin  Laplace-t vs GP  n = 20: 0.43  n = 40: 0.72  n = 60: 0.91  n = 80: 0.98  n = 100: 1.00
+  branin  VI-t vs GP       n = 20: 0.43  n = 40: 0.72  n = 60: 0.92  n = 80: 0.98  n = 100: 1.00
+  camel   Laplace-t vs GP  n = 20: 0.42  n = 40: 0.72  n = 60: 0.91  n = 80: 0.98  n = 100: 1.00
+  camel   VI-t vs GP       n = 20: 0.64  n = 40: 0.92  n = 60: 0.99  n = 80: 1.00  n = 100: 1.00
 
 Exploratory contrasts surviving BH q < 0.05 (all 252 tested together):
   branin  gaussian  incumbent mu_global vs y_best    fixed=GP        med d=  0.031 [ 0.010,  0.067] win=0.10 q=0.0132

@@ -50,7 +50,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.stats import false_discovery_control, rankdata, wilcoxon
+from scipy.stats import binomtest, false_discovery_control, rankdata, wilcoxon
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(HERE, "results")
@@ -88,6 +88,12 @@ def rank_biserial(d):
     return float((r[d > 0].sum() - r[d < 0].sum()) / r.sum())
 
 
+def sign_test(d):
+    d = np.asarray(d)
+    n, k = int(np.sum(d != 0)), int(np.sum(d < 0))
+    return n, k, (float(binomtest(k, n, 0.5, alternative="two-sided").pvalue) if n > 0 else 1.0)
+
+
 def boot_ci_median(d, rng):
     idx = rng.integers(0, len(d), size=(N_BOOT, len(d)))
     meds = np.median(d[idx], axis=1)
@@ -100,11 +106,12 @@ def contrast(a, b, rng):
     d = (a[s] - b[s]).to_numpy()
     lo, hi = boot_ci_median(d, rng)
     p = wilcoxon(a[s], b[s]).pvalue if np.any(d != 0) else 1.0
+    n_nz, n_neg, p_sign = sign_test(d)
     q = np.percentile(d, [0, 10, 25, 75, 90, 100])
     return dict(n=len(d), med_A=float(a[s].median()), med_B=float(b[s].median()),
                 med_diff=float(np.median(d)), ci_lo=float(lo), ci_hi=float(hi),
                 win=float(np.mean(d < 0)), tie=float(np.mean(d == 0)),
-                r_rb=rank_biserial(d), p=float(p),
+                r_rb=rank_biserial(d), p=float(p), n_nonzero=n_nz, n_neg=n_neg, p_sign=p_sign,
                 # distribution of the paired differences (not only the median)
                 d_min=q[0], d_q10=q[1], d_q25=q[2], d_q75=q[3], d_q90=q[4], d_max=q[5],
                 mean_diff=float(d.mean()), loss=float(np.mean(d > 0)),
@@ -171,23 +178,24 @@ def plot_distribution(df, prim):
     ax.set_xlabel("paired difference d = regret(A) - regret(B) per seed (symlog; < 0 favours A; bar = median)")
     ax.set_title("Selected Study B contrasts, 10% symmetric contamination, 20 matched seeds", fontsize=9)
     fig.tight_layout()
-    fig.savefig(os.path.join(HERE, "figures", "bo_contrast_distribution.pdf"))
+    fig.savefig(os.path.join(HERE, "figures", "bo_contrast_distribution.pdf"), metadata={"CreationDate": None})
     plt.close(fig)
 
 
-def power_lines(df, n_sim=2000, sizes=(20, 40, 60, 80)):
+def power_lines(df, n_sim=2000, sizes=(20, 40, 60, 80, 100)):
     """Prospective plan only: power of the planned confirmatory test
     (Wilcoxon, alpha = 0.05 / 4) when the observed 20 paired differences are resampled to n seeds.
     The effect sizes come from the same, selected data."""
     rng = np.random.default_rng(1)
     lines = ["", "Prospective plan: bootstrap power of the planned test (sym10, mu_obs, robust vs GP; "
-             "Wilcoxon at alpha = 0.05/4; observed differences resampled; optimistic)"]
+             "exact two-sided sign test, ties dropped, at alpha = 0.05/4; observed differences resampled; "
+             "optimistic)"]
     for p in sorted(df.problem.unique()):
         dn = df[(df.problem == p) & (df.noise == PRIMARY_NOISE)]
         for A in ("Laplace-t", "VI-t"):
             a, b = regret_series(dn, A, "mu_obs"), regret_series(dn, "GP", "mu_obs")
             d = (a - b.loc[a.index]).to_numpy()
-            pw = [np.mean([wilcoxon(s).pvalue < 0.05 / 4 if np.any(s != 0) else False
+            pw = [np.mean([sign_test(s)[2] < 0.05 / 4
                            for s in (rng.choice(d, n, replace=True) for _ in range(n_sim))]) for n in sizes]
             lines.append(f"  {p:7s} {A + ' vs GP':16s} " + "  ".join(f"n = {n}: {w:.2f}" for n, w in zip(sizes, pw)))
     return lines
@@ -216,6 +224,8 @@ def all_contrasts(df, rng):
                       for r in out.itertuples()]
     out["p_holm_primary"] = np.nan
     out.loc[out.primary, "p_holm_primary"] = holm(out.loc[out.primary, "p"])
+    out["p_sign_holm_primary"] = np.nan
+    out.loc[out.primary, "p_sign_holm_primary"] = holm(out.loc[out.primary, "p_sign"])
     return out
 
 
@@ -243,7 +253,7 @@ def main():
              f"  selected family     nominal p<0.05: {int((prim.p < 0.05).sum()):3d} / {len(prim)}   "
              f"Holm (within 14): {int((prim.p_holm_primary < 0.05).sum()):3d}",
              "",
-             "All contrasts are exploratory. The 14 selected contrasts were chosen from the design,",
+             "All contrasts are exploratory. The 14 'selected' contrasts were chosen from the design,",
              "but not documented before the results were seen, so they are not preregistered hypotheses.",
              "",
              "Selected contrasts (sym10). d = regret(A) - regret(B); negative favours A.",
@@ -253,6 +263,18 @@ def main():
         lines.append(f"{r.problem:7s} {r.family:9s} {r.A + ' vs ' + r.B:22s} {r.held_fixed:9s} "
                      f"{r.med_A:7.3f} {r.med_B:7.3f} {r.med_diff:7.3f} [{r.ci_lo:7.3f}, {r.ci_hi:7.3f}] "
                      f"{r.win:5.2f} {r.r_rb:6.2f} {r.p:8.5f} {r.p_holm_primary:7.4f}")
+    lines += ["", "Post-hoc sensitivity check: exact two-sided sign test on the same 14 selected contrasts",
+              "(H0: P(d < 0) = P(d > 0), ties dropped; no symmetry assumption). Exploratory and post hoc:",
+              "NOT confirmatory evidence. It shows that the conclusion depends on the estimand and the test.",
+              f"{'problem':7s} {'A vs B':22s} {'fixed':9s} {'d<0':>4s} {'d!=0':>5s} {'p sign':>11s} "
+              f"{'Holm14':>11s} {'p Wilcoxon':>11s} {'Holm14':>8s}"]
+    for r in prim.itertuples():
+        lines.append(f"{r.problem:7s} {r.A + ' vs ' + r.B:22s} {r.held_fixed:9s} {r.n_neg:4d} {r.n_nonzero:5d} "
+                     f"{r.p_sign:11.9f} {r.p_sign_holm_primary:11.9f} {r.p:11.6f} {r.p_holm_primary:8.4f}")
+    lines.append(f"  sign test: nominal p < 0.05 in {int((prim.p_sign < 0.05).sum())} / {len(prim)}, "
+                 f"Holm(14) < 0.05 in {int((prim.p_sign_holm_primary < 0.05).sum())} "
+                 f"(smallest {prim.p_sign_holm_primary.min():.9f}); Wilcoxon Holm(14) < 0.05 in "
+                 f"{int((prim.p_holm_primary < 0.05).sum())}")
     lines += distribution_lines(prim, out)
     lines += power_lines(df)
     lines += ["", "Exploratory contrasts surviving BH q < 0.05 (all 252 tested together):"]

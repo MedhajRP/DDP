@@ -18,6 +18,7 @@ from scipy.stats import wilcoxon
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RES, FIG, TAB = (os.path.join(HERE, d) for d in ("results", "figures", "tables"))
+PDF_META = {"CreationDate": None}        # no creation time in the PDFs, so they regenerate byte-for-byte
 for d in (FIG, TAB):
     os.makedirs(d, exist_ok=True)
 
@@ -64,7 +65,7 @@ def regression_note(p):
         text += (f" Laplace-$t$ intervals are not all equally trustworthy: {len(lap)} of the "
                  f"{len(NLABEL) * 30} Laplace-$t$ fits on this problem are flagged "
                  f"({int((lap.level == 'unreliable').sum())} unreliable), {eig} of them for a near-singular "
-                 r"Hessian (min eig$(B)<10^{-2}$), whose intervals are much wider "
+                 r"Hessian (min eig$(B)<10^{-2}$), whose intervals are wider "
                  r"(results/reliability\_flags.csv).")
     return text
 
@@ -123,7 +124,7 @@ def regression():
             ax.set_xlabel(r"contamination fraction $\epsilon$")
     axes[0, 0].legend(fontsize=8)
     fig.tight_layout()
-    fig.savefig(os.path.join(FIG, "regression_vs_eps.pdf"))
+    fig.savefig(os.path.join(FIG, "regression_vs_eps.pdf"), metadata=PDF_META)
     plt.close(fig)
     print("Study A figures/tables written")
 
@@ -199,7 +200,7 @@ def bo():
         axes[1, 0].set_ylabel("simple regret")
         axes[0, 0].legend(fontsize=7)
         fig.tight_layout()
-        fig.savefig(os.path.join(FIG, f"bo_curves_{tag}.pdf"))
+        fig.savefig(os.path.join(FIG, f"bo_curves_{tag}.pdf"), metadata=PDF_META)
         plt.close(fig)
 
     # Interaction plot: final median regret, model x incumbent, contaminated settings
@@ -219,7 +220,7 @@ def bo():
         ax.set_title(f"{PNAME[p]}: final median regret (n = 50)")
     fig.legend(fontsize=7, ncol=3, loc="lower center", bbox_to_anchor=(0.5, -0.12))
     fig.tight_layout()
-    fig.savefig(os.path.join(FIG, "bo_interaction.pdf"), bbox_inches="tight")
+    fig.savefig(os.path.join(FIG, "bo_interaction.pdf"), bbox_inches="tight", metadata=PDF_META)
     plt.close(fig)
     print("Study B figures/tables written")
 

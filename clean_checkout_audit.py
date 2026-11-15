@@ -55,9 +55,10 @@ DERIVED = [("paired_regression.py", ["results/regression_paired_tests.csv"]),
                                 "figures/regression_vs_eps.pdf", "figures/bo_curves_ybest.pdf",
                                 "figures/bo_curves_muobs.pdf", "figures/bo_interaction.pdf"]),
            ("bo_contrasts.py", ["results/bo_contrasts.csv", "results/bo_primary_contrasts.csv",
-                                "results/bo_contrasts_summary.txt"]),
+                                "results/bo_contrasts_summary.txt", "figures/bo_contrast_distribution.pdf"]),
            ("calibration_check.py", ["results/calibration_check.csv", "results/calibration_check_summary.txt"]),
-           ("verify_gp.py", ["results/verify_gp.txt", "figures/verify_gp.pdf"])]
+           ("verify_gp.py", ["results/verify_gp.txt", "figures/verify_gp.pdf"]),
+           ("posterior_checks.py --figure-only", ["figures/vi_elbo_traces.pdf"])]
 TIMING = {"fit_time", "wall"}            # wall-clock columns, not reproducible by definition
 report, commands = [], []
 
@@ -310,7 +311,7 @@ def main():
     reg_rows = []
     for script, files in DERIVED:
         before = {f: read_bytes(os.path.join(clone, f)) for f in files}
-        code, txt = run([sys.executable, script], clone, label=f"python {script}")
+        code, txt = run([sys.executable, *script.split()], clone, label=f"python {script}")
         for f in files:
             new = read_bytes(os.path.join(clone, f))
             blob = run(["git", "cat-file", "blob", f"HEAD:{f}"], clone, text=False, label=f"git cat-file HEAD:{f}")[1]
@@ -326,7 +327,9 @@ def main():
                 row["content"] = compare_csv(os.path.join(clone, f), tmp)
                 os.remove(tmp)
             elif f.endswith(".pdf"):
-                row["content"] = "PDF (embeds a creation time; not compared byte-wise)"
+                # the scripts write PDFs without a creation time (metadata CreationDate=None), so a
+                # PDF is compared byte-wise like every other file
+                row["content"] = "PDF, compared byte-wise"
             else:
                 row["content"] = f"{text_lines_differ(new, blob)} differing lines after CRLF -> LF"
             reg_rows.append(row)

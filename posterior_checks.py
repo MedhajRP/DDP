@@ -214,6 +214,10 @@ def vi_checks(pool):
             f"max curve diff {r.d_curve:.1e}, RMSE diff {r.d_rmse:.1e}, decreases in {r.inner_calls_with_decrease} loops")
     log()
 
+    plot_elbo_traces(a, traces)
+
+
+def plot_elbo_traces(a, traces):
     # figure: slowest cold-start traces
     top = a.sort_values("cold_iter", ascending=False).head(6)
     fig, ax = plt.subplots(figsize=(6.5, 4))
@@ -226,7 +230,7 @@ def vi_checks(pool):
     ax.set_title("VI-t inner loop: the six slowest Study A fits", fontsize=9)
     ax.legend(fontsize=7)
     fig.tight_layout()
-    fig.savefig(os.path.join(FIG, "vi_elbo_traces.pdf"))
+    fig.savefig(os.path.join(FIG, "vi_elbo_traces.pdf"), metadata={"CreationDate": None})
     plt.close(fig)
 
 
@@ -658,7 +662,13 @@ def main():
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--flags-only", action="store_true",
                     help="only apply the reliability rules (section 5) to the existing CSV files")
+    ap.add_argument("--figure-only", action="store_true",
+                    help="only redraw figures/vi_elbo_traces.pdf from the existing CSV files (no refits)")
     a = ap.parse_args()
+    if a.figure_only:
+        rd = lambda f: pd.read_csv(os.path.join(RES, f), float_precision="round_trip")
+        plot_elbo_traces(rd("vi_elbo_studyA.csv"), rd("vi_elbo_traces.csv"))
+        return
     if not a.flags_only:
         with Pool(a.workers) as pool:
             vi_checks(pool)
